@@ -7,24 +7,25 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "OWNER")
-public class Owner {
+public class Owner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private int id;
 
-    @OneToMany(mappedBy = "PAY_OWNER")
+    @OneToMany(mappedBy = "owner_id")
     private List<Payments> payments;
 
-    @Column(name = "NAME", nullable = false)
+    @Column(name = "NAME", nullable = false, columnDefinition = "TEXT")
     private String name;
 
-    @Column(name = "SURNAME", nullable = false)
+    @Column(name = "SURNAME", nullable = false, columnDefinition = "TEXT")
     private String surname;
 
     public int getId() {
