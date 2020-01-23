@@ -1,12 +1,6 @@
 package pl.cecherz.calcbill.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -17,9 +11,16 @@ public class Owner implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private int id;
+    private Integer id;
 
-    @OneToMany(mappedBy = "owner_id")
+    /*
+    fetch = FetchType.EAGER
+    Potrzebne by działała metoda OwnerController.selectAllFromDatabase()
+
+    FetchType.EAGER – pobieramy dane, gdy zostaje wykonane zapytanie pobierające nadrzędną część relacji.
+    @see: http://nullpointerexception.pl/trzy-rzeczy-ktore-powinienes-wiedziec-o-hibernate/
+     */
+    @OneToMany(mappedBy = "owner_id", fetch = FetchType.EAGER)
     private List<Payments> payments;
 
     @Column(name = "NAME", nullable = false, columnDefinition = "TEXT")
@@ -28,11 +29,25 @@ public class Owner implements Serializable {
     @Column(name = "SURNAME", nullable = false, columnDefinition = "TEXT")
     private String surname;
 
+    public Owner(String name, String surname) {
+        this.name = name;
+        this.surname = surname;
+    }
+
+    public Owner(Integer id, List<Payments> payments, String name, String surname) {
+        this.id = id;
+        this.payments = payments;
+        this.name = name;
+        this.surname = surname;
+    }
+
+    public Owner() {}
+
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

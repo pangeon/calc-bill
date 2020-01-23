@@ -5,6 +5,24 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<p>Wykonaj test <a href="/templates/greeting.html">kliknij</a></p>
+    <p>Wykonaj test: <a href="/greeting">kliknij</a></p>
+    <h3>3.1</h3>
+    <p>getName: <a href="/api//owners/31">kliknij</a></p>
+    <h3>3.2</h3>
+    <p>getOwnerUnit: <a href="/api//owners/32/unit">kliknij</a></p>
+    <p>getOwnerList: <a href="/api/owners/32/list">kliknij</a></p>
+    <p>getOwnerEmptyList: <a href="/api//owners/32/empty-list">kliknij</a></p>
+    <p>addOwnerToList: <a href="/api/owners/add">kliknij</a></p>
+    <form method="post" action="/api/owners/32/add">
+        <fieldset>
+            <label for="name">Name:</label>
+            <input id="name" type="text" />
+            <br />
+            <label for="surname">Surname:</label>
+            <input id="surname" type="text" />
+            <br />
+            <input type="submit" value="Send">
+        </fieldset>
+    </form>
 </body>
 </html>

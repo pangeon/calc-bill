@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "payments": [],
+    "name": "Kamil",
+    "surname": "Cecherz"
+  },
+  {
+    "id": 2,
+    "payments": [],
+    "name": "Łukasz",
+    "surname": "Bednarski"
+  },
+  {
+    "id": 3,
+    "payments": [],
+    "name": "Roman",
+    "surname": "Giertych"
+  },
+  {
+    "id": 4,
+    "payments": [],
+    "name": "Adam",
+    "surname": "Małysz"
+  }
+]

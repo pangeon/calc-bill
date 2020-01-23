@@ -34,6 +34,15 @@ public class Payments implements Serializable {
     @Column(name = "DATE", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp date;
 
+    public Payments() {};
+
+    public Payments(Owner owner_id, String kind, double amount, Timestamp date) {
+        //this.owner_id = owner_id;
+        this.kind = kind;
+        this.amount = amount;
+        this.date = date;
+    }
+
     public int getId() {
         return id;
     }
@@ -42,13 +51,13 @@ public class Payments implements Serializable {
         this.id = id;
     }
 
-    public Owner getOwner_id() {
-        return owner_id;
-    }
+//    public Owner getOwner_id() {
+//        return owner_id;
+//    }
 
-    public void setOwner_id(Owner owner_id) {
-        this.owner_id = owner_id;
-    }
+//    public void setOwner_id(Owner owner_id) {
+//        this.owner_id = owner_id;
+//    }
 
     public String getKind() {
         return kind;
@@ -81,21 +90,23 @@ public class Payments implements Serializable {
         Payments payments = (Payments) o;
         return getId() == payments.getId() &&
                 Double.compare(payments.getAmount(), getAmount()) == 0 &&
-                getOwner_id().equals(payments.getOwner_id()) &&
+                //getOwner_id().equals(payments.getOwner_id()) &&
                 getKind().equals(payments.getKind()) &&
                 getDate().equals(payments.getDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getOwner_id(), getKind(), getAmount(), getDate());
+        return Objects.hash(getId(),
+                //getOwner_id(),
+                getKind(), getAmount(), getDate());
     }
 
     @Override
     public String toString() {
         return "Payments{" +
                 "id=" + id +
-                ", owner_id=" + owner_id +
+                //", owner_id=" + owner_id +
                 ", kind='" + kind + '\'' +
                 ", amount=" + amount +
                 ", date=" + date +

@@ -10,5 +10,4 @@ public class CalcBillApplication {
 		SpringApplication.run(CalcBillApplication.class, args);
 		System.out.println("Aplikacja Calc-Bill uruchomiona.");
 	}
-
 }
