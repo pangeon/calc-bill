@@ -2,25 +2,22 @@ package pl.cecherz.calcbill.utils;
 
 public class MessageBuilder {
 
-    private static Class TARGET_CLASS;
+    private Class TARGET_CLASS;
 
-    public static void setTargetClass(Class targetClass) {
-        TARGET_CLASS = targetClass;
+    public MessageBuilder(Class TARGET_CLASS) {
+        this.TARGET_CLASS = TARGET_CLASS;
     }
-    private static String showClass() {
-        return TARGET_CLASS.toString();
-    }
-    public static void getInfo(Object... functionParameters) {
-        StringBuilder diagnosticMessageBilder = new StringBuilder();
-        diagnosticMessageBilder
-                .append(MessageBuilder.showClass())
+    public void getInfo(Object... functionParameters) {
+        StringBuilder diagnosticMessage = new StringBuilder();
+        diagnosticMessage
+                .append(TARGET_CLASS.toString())
                 .append("\n");
         for (Object functionParameter : functionParameters) {
-            diagnosticMessageBilder
+            diagnosticMessage
                     .append(functionParameter.toString())
                     .append("\n");
         }
-        System.out.println(diagnosticMessageBilder);
+        System.out.println(diagnosticMessage);
     }
 
 }

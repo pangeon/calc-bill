@@ -1,14 +1,8 @@
 package pl.cecherz.calcbill.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -19,25 +13,27 @@ public class Payments implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
-    private int id;
+    private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "OWNER_ID", foreignKey=@ForeignKey(name="OWNER_ID"), nullable = false)
-    private Owner owner_id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OWNER_ID",
+            foreignKey=@ForeignKey(name="OWNER_ID"),
+            nullable = false)
+    private Owner ownerId;
 
     @Column(name = "KIND", nullable = false, columnDefinition = "TINYTEXT")
     private String kind;
 
     @Column(name = "AMOUNT", nullable = false)
-    private double amount;
+    private Double amount;
 
     @Column(name = "DATE", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp date;
 
-    public Payments() {};
+    public Payments() {}
 
-    public Payments(Owner owner_id, String kind, double amount, Timestamp date) {
-        //this.owner_id = owner_id;
+    public Payments(Integer id, String kind, Double amount, Timestamp date) {
+        this.id = id;
         this.kind = kind;
         this.amount = amount;
         this.date = date;
@@ -51,14 +47,6 @@ public class Payments implements Serializable {
         this.id = id;
     }
 
-//    public Owner getOwner_id() {
-//        return owner_id;
-//    }
-
-//    public void setOwner_id(Owner owner_id) {
-//        this.owner_id = owner_id;
-//    }
-
     public String getKind() {
         return kind;
     }
@@ -67,11 +55,11 @@ public class Payments implements Serializable {
         this.kind = kind;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -90,7 +78,6 @@ public class Payments implements Serializable {
         Payments payments = (Payments) o;
         return getId() == payments.getId() &&
                 Double.compare(payments.getAmount(), getAmount()) == 0 &&
-                //getOwner_id().equals(payments.getOwner_id()) &&
                 getKind().equals(payments.getKind()) &&
                 getDate().equals(payments.getDate());
     }
@@ -98,7 +85,6 @@ public class Payments implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getId(),
-                //getOwner_id(),
                 getKind(), getAmount(), getDate());
     }
 
@@ -106,7 +92,6 @@ public class Payments implements Serializable {
     public String toString() {
         return "Payments{" +
                 "id=" + id +
-                //", owner_id=" + owner_id +
                 ", kind='" + kind + '\'' +
                 ", amount=" + amount +
                 ", date=" + date +

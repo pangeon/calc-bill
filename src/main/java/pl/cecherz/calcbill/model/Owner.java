@@ -20,7 +20,9 @@ public class Owner implements Serializable {
     FetchType.EAGER – pobieramy dane, gdy zostaje wykonane zapytanie pobierające nadrzędną część relacji.
     @see: http://nullpointerexception.pl/trzy-rzeczy-ktore-powinienes-wiedziec-o-hibernate/
      */
-    @OneToMany(mappedBy = "owner_id", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "ownerId",
+            fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL)
     private List<Payments> payments;
 
     @Column(name = "NAME", nullable = false, columnDefinition = "TEXT")
