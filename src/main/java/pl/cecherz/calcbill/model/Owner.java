@@ -1,5 +1,7 @@
 package pl.cecherz.calcbill.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -20,6 +22,7 @@ public class Owner implements Serializable {
     FetchType.EAGER – pobieramy dane, gdy zostaje wykonane zapytanie pobierające nadrzędną część relacji.
     @see: http://nullpointerexception.pl/trzy-rzeczy-ktore-powinienes-wiedziec-o-hibernate/
      */
+    @JsonManagedReference
     @OneToMany(mappedBy = "ownerId",
             fetch = FetchType.EAGER,
             cascade = CascadeType.ALL)

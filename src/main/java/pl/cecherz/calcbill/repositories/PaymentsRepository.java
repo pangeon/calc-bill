@@ -13,4 +13,6 @@ public interface PaymentsRepository extends CrudRepository<Payments, Integer> {
     Payments findPaymentById(Integer id);
     List<Payments> findPaymentsByKind(String kindOfPayments);
     List<Payments> findPaymentsByOwnerId(Owner ownerId);
+    List<Payments> findPaymentsByAmountBetween(Double min, Double max);
+    List<Payments> findPaymentsByOwnerIdAndAmountBetween(Owner ownerId, Double min, Double max);
 }

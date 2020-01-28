@@ -7,6 +7,8 @@ import pl.cecherz.calcbill.model.Payments;
 import pl.cecherz.calcbill.repositories.PaymentsRepository;
 import pl.cecherz.calcbill.utils.MessageBuilder;
 
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -70,7 +72,44 @@ public class PaymentsControllerDB {
                 .stream()
                 .filter(payments -> payments.getAmount() <= range)
                 .findAny();
-          message.getInfo("filterPaymentsByAmount", paymentsList);
+          message.getInfo("filterPaymentsByAmount()", paymentsList);
           return paymentsList;
+    }
+    /* Dane w formie JSON-a zostają pobrane z bazy danych:
+    odpowiednik zapytania SELECT * FROM payments WHERE payments.amount > ? and payments.amount < ?;
+    Zwracana jest lista płatności z zakresu */
+    @GetMapping("/select/range/min/{min}/max/{max}")
+    public List<Payments> filterPaymentsByAmountRange(@PathVariable Double min, @PathVariable Double max) {
+        List<Payments> paymentsList = paymentsRepository.findPaymentsByAmountBetween(min, max);
+        message.getInfo("filterPaymentsByAmountRange()", paymentsList);
+        return paymentsList;
+    }
+    /* Dane w formie JSON-a zostają pobrane z bazy danych:
+    odpowiednik zapytania: SELECT * FROM payments WHERE payments.id = ? and payments.amount > ? and payments.amount < ?;
+    Zwracana jest lista płatności z zakresu */
+    @GetMapping("/select/id/{id}/range/min/{min}/max/{max}")
+    public List<Payments> filterPaymentsByAmountRangeAndOwnerId(@PathVariable Owner id,
+            @PathVariable Double min, @PathVariable Double max) {
+        List<Payments> paymentsList = paymentsRepository.findPaymentsByOwnerIdAndAmountBetween(id, min, max);
+        message.getInfo("filterPaymentsByAmountRangeAndOwnerId()", paymentsList);
+        return paymentsList;
+    }
+    /* Dane w formie JSON-a zostają zapisane w bazie danych:
+    opowiednik zapytania INSERT INTO payments (id, amount, kind) VALUES (...)
+    Podanie id jest koniecznie mimo iż model zawiera właściwość @GeneratedValue(strategy = GenerationType.IDENTITY)
+    - Dodaje najwyższe możliwe id większe o jeden od ostatniego
+    - Napisuje wartość gdy podamy istniejące id
+
+    PROBLEM: metoda nie wstawia klucza obcego, płatność nie ma posiada, nie istnieje relacja pomiędzy danymi,
+    metoda działa tylko po zdjęciu ograniczenia z bazy danych Payments [ownerId nullable = true]
+    */
+    @PostMapping("/insert/{id}")
+    void insertOwner(@RequestBody Payments body, @PathVariable Integer id) {
+        message.getInfo("insertPayment()", body);
+        Owner owner = new Owner();
+        owner.setId(id);
+        body.setOwnerId(owner);
+        body.setDate(new Timestamp(System.currentTimeMillis()));
+        paymentsRepository.save(body);
     }
 }
