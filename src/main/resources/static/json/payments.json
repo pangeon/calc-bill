@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "ownerId": 1,
     "kind": "car",
     "amount": 2040.49,
     "date": "2018-01-01T12:10:09.805+0000"
@@ -8,13 +9,36 @@
   {
     "id": 2,
     "kind": "home",
+    "ownerId": 1,
     "amount": 20.0,
     "date": "2019-07-04T13:33:03.969+0000"
   },
   {
     "id": 3,
+    "ownerId": 2,
     "kind": "medicine",
     "amount": 320.8,
     "date": "2013-07-04T18:37:02.988+0000"
+  },
+  {
+    "id": 4,
+    "ownerId": 2,
+    "kind": "shopping",
+    "amount": 956.85,
+    "date": "2015-09-04T98:39:02.988+0000"
+  },
+  {
+    "id": 5,
+    "ownerId": 2,
+    "kind": "medicine",
+    "amount": 159.33,
+    "date": "2012-01-04T98:10:03.990+0000"
+  },
+  {
+    "id": 6,
+    "ownerId": 2,
+    "kind": "toys",
+    "amount": 51.02,
+    "date": "2019-05-11T98:10:03.990+0000"
   }
 ]

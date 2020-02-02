@@ -2,8 +2,8 @@ package pl.cecherz.calcbill.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import pl.cecherz.calcbill.model.Owner;
-import pl.cecherz.calcbill.model.Payments;
+import pl.cecherz.calcbill.model.db.Owner;
+import pl.cecherz.calcbill.model.db.Payments;
 
 import java.util.List;
 

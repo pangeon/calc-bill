@@ -2,8 +2,8 @@ package pl.cecherz.calcbill.controller.payments;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import pl.cecherz.calcbill.model.Owner;
-import pl.cecherz.calcbill.model.Payments;
+import pl.cecherz.calcbill.model.db.Owner;
+import pl.cecherz.calcbill.model.db.Payments;
 import pl.cecherz.calcbill.repositories.PaymentsRepository;
 import pl.cecherz.calcbill.utils.MessageBuilder;
 

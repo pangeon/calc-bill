@@ -47,7 +47,7 @@ The following guides illustrate how to use some features concretely:
         | amount   | double    | NO   |     | NULL              |                   |
         | date     | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
         | kind     | tinytext  | NO   |     | NULL              |                   |
-        | owner_id | int(11)   | YES  | MUL | NULL              |                   |
+        | owner_JSON_id | int(11)   | YES  | MUL | NULL              |                   |
         +----------+-----------+------+-----+-------------------+-------------------
 
 ##### Relations:

@@ -18,5 +18,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(HttpMethod.POST, "/**");
+        web.ignoring().antMatchers(HttpMethod.PUT, "/**");
+        web.ignoring().antMatchers(HttpMethod.PATCH, "/**");
+        web.ignoring().antMatchers(HttpMethod.DELETE, "/**");
     }
 }

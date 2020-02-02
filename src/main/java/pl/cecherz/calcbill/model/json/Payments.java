@@ -1,55 +1,27 @@
-package pl.cecherz.calcbill.model;
+package pl.cecherz.calcbill.model.json;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
+;
 
-@Entity
-@Table(name = "PAYMENTS")
 public class Payments implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
+
     private Integer id;
-
-    @JsonBackReference
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "OWNER_ID",
-            foreignKey=@ForeignKey(name="OWNER_ID"),
-            nullable = false) // TO FIXED: tymczasowe usunięcie ograniczenia z bazy danych
-    private Owner ownerId;
-
-    @Column(name = "KIND", nullable = false, columnDefinition = "TINYTEXT")
+    private Integer ownerId;
     private String kind;
-
-    @Column(name = "AMOUNT", nullable = false)
     private Double amount;
-
-    @Column(name = "DATE", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp date;
 
-    public Payments() {}
-
-    public Payments(Owner ownerId, String kind, Double amount, Timestamp date) {
+    public Payments(Integer id, Integer ownerId, String kind, Double amount, Timestamp date) {
+        this.id = id;
         this.ownerId = ownerId;
         this.kind = kind;
         this.amount = amount;
         this.date = date;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -57,11 +29,11 @@ public class Payments implements Serializable {
         this.id = id;
     }
 
-    public Owner getOwnerId() {
+    public Integer getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(Owner ownerId) {
+    public void setOwnerId(Integer ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -94,22 +66,23 @@ public class Payments implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Payments)) return false;
         Payments payments = (Payments) o;
-        return getId() == payments.getId() &&
-                Double.compare(payments.getAmount(), getAmount()) == 0 &&
+        return getId().equals(payments.getId()) &&
+                getOwnerId().equals(payments.getOwnerId()) &&
                 getKind().equals(payments.getKind()) &&
+                getAmount().equals(payments.getAmount()) &&
                 getDate().equals(payments.getDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(),
-                getKind(), getAmount(), getDate());
+        return Objects.hash(getId(), getOwnerId(), getKind(), getAmount(), getDate());
     }
 
     @Override
     public String toString() {
         return "Payments{" +
                 "id=" + id +
+                ", ownerId=" + ownerId +
                 ", kind='" + kind + '\'' +
                 ", amount=" + amount +
                 ", date=" + date +
