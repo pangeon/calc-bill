@@ -1,4 +1,4 @@
-package pl.cecherz.calcbill.controller.owner;
+package pl.cecherz.calcbill.controller.db;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +17,9 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/api/owners")
 @Component("OwnerControllerDB")
-public class OwnerControllerDB {
+public class OwnerController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
-    private MessageBuilder message = new MessageBuilder(OwnerControllerDB.class);
+    private MessageBuilder message = new MessageBuilder(OwnerController.class);
 
     /* Dane zapisane z użyciem obiektu Owner repository trafiają do bazy danych, do pamięci trwałej */
     private final OwnerRepository ownerRepository;
@@ -29,7 +29,7 @@ public class OwnerControllerDB {
         message.getInfo("Init owners collection:", owners);
     }
 
-    public OwnerControllerDB(OwnerRepository ownerRepository) {
+    public OwnerController(OwnerRepository ownerRepository) {
         this.ownerRepository = ownerRepository;
     }
     @GetMapping("/select")

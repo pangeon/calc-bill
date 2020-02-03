@@ -1,5 +1,7 @@
 package pl.cecherz.calcbill.model.json;
 
+import org.springframework.security.core.parameters.P;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -20,6 +22,7 @@ public class Payments implements Serializable {
         this.amount = amount;
         this.date = date;
     }
+    public Payments() {}
 
     public Integer getId() {
         return id;

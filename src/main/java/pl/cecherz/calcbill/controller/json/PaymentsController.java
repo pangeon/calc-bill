@@ -1,8 +1,18 @@
-package pl.cecherz.calcbill.controller.payments;
+package pl.cecherz.calcbill.controller.json;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cecherz.calcbill.model.json.Payments;
+import pl.cecherz.calcbill.utils.JsonDataManager;
 import pl.cecherz.calcbill.utils.MessageBuilder;
 
 import java.util.ArrayList;
@@ -15,12 +25,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/payments")
 @Component("PaymentsControllerJSON")
-public class PaymentsControllerJSON {
+public class PaymentsController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
-    private MessageBuilder message = new MessageBuilder(PaymentsControllerJSON.class);
+    private MessageBuilder message = new MessageBuilder(PaymentsController.class);
 
     /* Dane zapisane w postaci listy przechowywane są tylko w pamięci tymczasowej */
-    private Collection<Payments> paymentsList = new ArrayList<>();
+    private Collection<Payments> paymentsList = JsonDataManager.initPayments();
 
     /* Zwraca JSON-a reprezentację kolekcji z obiektami płatności. */
     @GetMapping()

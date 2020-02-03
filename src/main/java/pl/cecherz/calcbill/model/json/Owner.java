@@ -18,6 +18,7 @@ public class Owner implements Serializable {
         this.name = name;
         this.surname = surname;
     }
+    public Owner() {}
     public Integer getId() {
         return id;
     }

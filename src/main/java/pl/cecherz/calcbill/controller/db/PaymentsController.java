@@ -1,7 +1,12 @@
-package pl.cecherz.calcbill.controller.payments;
+package pl.cecherz.calcbill.controller.db;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cecherz.calcbill.model.db.Owner;
 import pl.cecherz.calcbill.model.db.Payments;
 import pl.cecherz.calcbill.repositories.PaymentsRepository;
@@ -14,14 +19,14 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/payments")
 @Component("PaymentsControllerDB")
-public class PaymentsControllerDB {
+public class PaymentsController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
-    private MessageBuilder message = new MessageBuilder(PaymentsControllerDB.class);
+    private MessageBuilder message = new MessageBuilder(PaymentsController.class);
 
     /* Dane zapisane z użyciem obiektu Payments repository trafiają do bazy danych, do pamięci trwałej */
     private final PaymentsRepository paymentsRepository;
 
-    public PaymentsControllerDB(PaymentsRepository paymentsRepository) {
+    public PaymentsController(PaymentsRepository paymentsRepository) {
         this.paymentsRepository = paymentsRepository;
     }
 
