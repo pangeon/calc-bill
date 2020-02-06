@@ -16,7 +16,6 @@ import pl.cecherz.calcbill.model.json.Payments;
 import pl.cecherz.calcbill.utils.JsonDataManager;
 import pl.cecherz.calcbill.utils.MessageBuilder;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
