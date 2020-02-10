@@ -43,12 +43,17 @@ The following guides illustrate how to use some features concretely:
         +----------+-----------+------+-----+-------------------+-------------------+
         | Field    | Type      | Null | Key | Default           | Extra             |
         +----------+-----------+------+-----+-------------------+-------------------+
-        | id       | int(11)   | NO   | PRI | NULL              | auto_increment    |
+        | id       | int       | NO   | PRI | NULL              | auto_increment    |
         | amount   | double    | NO   |     | NULL              |                   |
         | date     | timestamp | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
         | kind     | tinytext  | NO   |     | NULL              |                   |
-        | owner_JSON_id | int(11)   | YES  | MUL | NULL              |                   |
-        +----------+-----------+------+-----+-------------------+-------------------
+        | owner_id | int       | YES  | MUL | NULL              |                   |
+        +----------+-----------+------+-----+-------------------+-------------------+
 
 ##### Relations:
 ![table diagram](readme-img/model_mysql_workbench.png)
+
+### Diagram class UML
+ 
+####pl.cecherz.calcbill.controller.json
+![uml diagram](readme-img/uml-diagram.png)

@@ -101,15 +101,16 @@ public class OwnerController {
                 "payment: ", payment,
                 ownersList);
     }
-
+    /* Usuwa posiadacza z kolekcji po wskazanym id */
     @DeleteMapping("/{id}")
-    public void deletePayment(@PathVariable Integer id) {
+    public void deleteOwner(@PathVariable Integer id) {
         ownersList.removeIf(owner -> owner.getId().equals(id));
     }
-
-    private Optional<Owner> findOwnerById(Integer id) {
-        return ownersList.stream()
-                .filter(owner -> owner.getId().equals(id))
-                .findAny();
-    }
+    /* Metody prywatne wykorzystywane w API */
+        private Optional<Owner> findOwnerById(Integer id) {
+            return ownersList.stream()
+                    .filter(owner -> owner.getId().equals(id))
+                    .findAny();
+        }
+    /* --------------------------------------------- */
 }
