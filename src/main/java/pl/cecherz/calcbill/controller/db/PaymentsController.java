@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/api/db/payments")
 @Component("PaymentsControllerDB")
 public class PaymentsController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */

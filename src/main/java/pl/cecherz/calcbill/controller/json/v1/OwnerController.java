@@ -1,4 +1,4 @@
-package pl.cecherz.calcbill.controller.json;
+package pl.cecherz.calcbill.controller.json.v1;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/owners")
-@Component("OwnerControllerJSON")
+@RequestMapping("/api/v1/owners")
+@Component("OwnerControllerJSON-V1")
 public class OwnerController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
     private MessageBuilder message = new MessageBuilder(OwnerController.class);

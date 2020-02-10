@@ -55,5 +55,5 @@ The following guides illustrate how to use some features concretely:
 
 ### Diagram class UML
  
-####pl.cecherz.calcbill.controller.json
+#### pl.cecherz.calcbill.controller.json.v1
 ![uml diagram](readme-img/uml-diagram.png)

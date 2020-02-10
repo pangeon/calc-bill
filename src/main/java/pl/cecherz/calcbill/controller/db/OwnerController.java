@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/api/owners")
+@RequestMapping("/api/db/owners")
 @Component("OwnerControllerDB")
 public class OwnerController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */

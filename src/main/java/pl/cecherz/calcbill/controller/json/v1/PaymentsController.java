@@ -1,4 +1,4 @@
-package pl.cecherz.calcbill.controller.json;
+package pl.cecherz.calcbill.controller.json.v1;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,8 +22,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/payments")
-@Component("PaymentsControllerJSON")
+@RequestMapping("/api/v1/payments")
+@Component("PaymentsControllerJSON-V1")
 public class PaymentsController {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
     private MessageBuilder message = new MessageBuilder(PaymentsController.class);
