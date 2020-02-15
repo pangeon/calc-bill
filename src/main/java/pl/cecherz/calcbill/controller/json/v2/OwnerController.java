@@ -5,7 +5,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cecherz.calcbill.model.json.Owner;
 import pl.cecherz.calcbill.model.json.Payments;
 import pl.cecherz.calcbill.utils.CSS_Style;
@@ -50,20 +61,32 @@ public class OwnerController extends HTTPHeaderUtils {
         message.getInfo("V2 :: getHTMLOwnersNamesandSurname()", pageHTMLwithOwnersNameAndSurname);
         return pageHTMLwithOwnersNameAndSurname;
     }
-    /* Zwraca JSON-a wartość jednego pola będącego zagnieżdżoną tablicą i reprezentacją obiektu Payments */
+    /* Zwraca JSON-a wartość jednego pola będącego zagnieżdżoną tablicą i reprezentacją obiektu Payments
+    Zwraca kod 200 - OK, 204 - NO CONTENT, kod 404 - NOT FOUND */
     @GetMapping(value = "/payments", params = "id")
-    public Optional<List<Payments>> getOwnerPayment(@RequestParam("id") Integer id) {
+    public ResponseEntity<Optional<List<Payments>>> getOwnerPayment(@RequestParam("id") Integer id) {
         var payments = findOwnerById(id).map(Owner::getPayments);
-        message.getInfo("V2 :: getOwnerPayment()", payments);
-        return payments;
+        if(findOwnerById(id).isEmpty()) {
+            message.getInfo("V2 :: getOwnerPayment()", payments, "status", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else {
+            if (payments.toString().equals("Optional[[]]")) {
+                message.getInfo("V2 :: getOwnerPayment()", payments, "status", HttpStatus.NO_CONTENT);
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            } else {
+                message.getInfo("V2 :: getOwnerPayment()", payments, "status", HttpStatus.OK);
+                return ResponseEntity.ok().body(payments);
+            }
+        }
     }
-    /* Zwraca JSON-a reprezentację jednego obiektu użytkownika. */
+    /* Zwraca JSON-a reprezentację jednego obiektu użytkownika.
+    Zwraca kod 200 - OK lub kod 404 - NOT FOUND */
     @GetMapping(params = "id")
     public ResponseEntity<Optional<Owner>> getOwner(@RequestParam("id") Integer id) {
-        Optional<Owner> filteredOwners = findOwnerById(id);
+        var filteredOwners = findOwnerById(id);
         if (findOwnerById(id).isEmpty()) {
-            message.getInfo("V2 :: getOwner()", filteredOwners, "status", HttpStatus.NO_CONTENT);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(filteredOwners);
+            message.getInfo("V2 :: getOwner()", filteredOwners, "status", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             message.getInfo("V2 :: getOwner()", filteredOwners, "status", HttpStatus.OK);
             return ResponseEntity.ok().body(filteredOwners);
@@ -74,41 +97,41 @@ public class OwnerController extends HTTPHeaderUtils {
     * { "id": 4,  "payments": [ { "id": ..., "ownerId": ..., "kind": "...", "amount": ..., "date": "..." } ],
     "name": "Marcin", "surname": "Luter"}
     Zwraca kod 200 - OK lub kod 404 - NOT FOUND */
-    @PutMapping("/{id}")
-    public ResponseEntity<?> replaceOwner(@PathVariable Integer id, @RequestBody Owner newOwner) {
-        if (findOwnerById(id).isEmpty()) {
-            message.getInfo("V2 :: replaceOwner()", "status", HttpStatus.NOT_FOUND);
-            return ResponseEntity.notFound().build();
-        } else {
-            findOwnerById(id).ifPresent(owner -> {
-                owner.setId(newOwner.getId());
-                owner.setName(newOwner.getName());
-                owner.setSurname(newOwner.getSurname());
-                owner.setPayments(newOwner.getPayments());
-                message.getInfo("V2 :: replaceOwner()", Collections.singletonList(owner), newOwner);
-            });
-            message.getInfo("V2 :: replaceOwner()", "status", HttpStatus.OK);
-            return ResponseEntity.status(HttpStatus.OK).build();
+        @PutMapping("/{id}")
+        public ResponseEntity<?> replaceOwner(@PathVariable Integer id, @RequestBody Owner newOwner) {
+            if (findOwnerById(id).isEmpty()) {
+                message.getInfo("V2 :: replaceOwner()", "status", HttpStatus.NOT_FOUND);
+                return ResponseEntity.notFound().build();
+            } else {
+                findOwnerById(id).ifPresent(owner -> {
+                    owner.setId(newOwner.getId());
+                    owner.setName(newOwner.getName());
+                    owner.setSurname(newOwner.getSurname());
+                    owner.setPayments(newOwner.getPayments());
+                    message.getInfo("V2 :: replaceOwner()", Collections.singletonList(owner), newOwner);
+                });
+                message.getInfo("V2 :: replaceOwner()", "status", HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
         }
-    }
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateOwner(@PathVariable Integer id, @RequestBody Owner ownerValuesToReplace) {
-        if (findOwnerById(id).isEmpty()) {
-            message.getInfo("V2 :: updateOwner()", "status", HttpStatus.NOT_FOUND);
-            return ResponseEntity.notFound().build();
-        } else {
-            findOwnerById(id).ifPresent(owner -> {
-                if(ownerValuesToReplace.getId() != null) owner.setId(ownerValuesToReplace.getId());
-                if(ownerValuesToReplace.getName() != null) owner.setName(ownerValuesToReplace.getName());
-                if(ownerValuesToReplace.getSurname() != null) owner.setSurname(ownerValuesToReplace.getSurname());
-                if(ownerValuesToReplace.getPayments() != null) owner.setPayments(ownerValuesToReplace.getPayments());
-                message.getInfo("V2 :: updateOwner()", Collections.singletonList(owner), ownerValuesToReplace);
-            });
-            message.getInfo("V2 :: updateOwner()", "status", HttpStatus.OK);
-            return ResponseEntity.status(HttpStatus.OK).build();
+        @PatchMapping("/{id}")
+        public ResponseEntity<?> updateOwner(@PathVariable Integer id, @RequestBody Owner ownerValuesToReplace) {
+            if (findOwnerById(id).isEmpty()) {
+                message.getInfo("V2 :: updateOwner()", "status", HttpStatus.NOT_FOUND);
+                return ResponseEntity.notFound().build();
+            } else {
+                findOwnerById(id).ifPresent(owner -> {
+                    if(ownerValuesToReplace.getId() != null) owner.setId(ownerValuesToReplace.getId());
+                    if(ownerValuesToReplace.getName() != null) owner.setName(ownerValuesToReplace.getName());
+                    if(ownerValuesToReplace.getSurname() != null) owner.setSurname(ownerValuesToReplace.getSurname());
+                    if(ownerValuesToReplace.getPayments() != null) owner.setPayments(ownerValuesToReplace.getPayments());
+                    message.getInfo("V2 :: updateOwner()", Collections.singletonList(owner), ownerValuesToReplace);
+                });
+                message.getInfo("V2 :: updateOwner()", "status", HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
         }
-    }
-    /* --------------------------------------------- */
+        /* --------------------------------------------- */
     /* Dodaje użytkownika do kolekcji: { "id": 1, "payments": [], "name": "Kamil", "surname": "Cecherz" }
     Zwraca kod 201 - CREATED */
     @ResponseStatus(HttpStatus.CREATED)
