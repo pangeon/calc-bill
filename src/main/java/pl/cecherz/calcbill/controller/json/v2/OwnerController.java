@@ -48,7 +48,7 @@ public class OwnerController extends HTTPHeaderUtils {
         return ResponseEntity.ok().header("Cache-Control", "max-age" + "=300").body(ownersList);
     }
     /* Zwraca listę użytkowników (imię i nazwisko) w postaci HTML-a */
-    @GetMapping(value = "/html",produces = MediaType.TEXT_HTML_VALUE, params = "color")
+    @GetMapping(produces = MediaType.TEXT_HTML_VALUE, params = {"color", "fontsize"})
     public String getHTMLOwnersNamesandSurname(@RequestParam("color") String color, @RequestParam("fontsize") String fontsize) {
         final String collect = ownersList.stream()
                 .flatMap(owner -> Stream.of("<p>" + owner.getName(), owner.getSurname() + "</p>"))
