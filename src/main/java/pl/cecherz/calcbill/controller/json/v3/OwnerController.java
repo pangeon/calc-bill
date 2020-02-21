@@ -1,14 +1,25 @@
 package pl.cecherz.calcbill.controller.json.v3;
 
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cecherz.calcbill.controller.json.rest_utils.HTTPHeaderUtils;
+import pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder;
 import pl.cecherz.calcbill.model.json.Owner;
 import pl.cecherz.calcbill.model.json.Payments;
 import pl.cecherz.calcbill.utils.CSS_Style;
@@ -36,7 +47,7 @@ public class OwnerController extends HTTPHeaderUtils {
     Przechowuje informacje w cachu przez 5 minut */
     @GetMapping
     public ResponseEntity<List<Owner>> getAllOwners() {
-        message.getInfo("V2 :: getAllOwners()", ownersList);
+        message.getInfo("V3 :: getAllOwners()", ownersList);
         return ResponseEntity.ok().header("Cache-Control", "max-age" + "=300").body(ownersList);
     }
     /* Zwraca listę użytkowników (imię i nazwisko) w postaci HTML-a */
@@ -50,7 +61,7 @@ public class OwnerController extends HTTPHeaderUtils {
         style.addParamStyle(color, fontsize);
         String pageHTMLwithOwnersNameAndSurname = ContentHTMLWrapper.wrapToHTML(collect, "Owners name", style.getStyle());
 
-        message.getInfo("V2 :: getHTMLOwnersNamesandSurname()", pageHTMLwithOwnersNameAndSurname);
+        message.getInfo("V3 :: getHTMLOwnersNamesandSurname()", pageHTMLwithOwnersNameAndSurname);
         return pageHTMLwithOwnersNameAndSurname;
     }
     /* Zwraca JSON-a wartość jednego pola będącego zagnieżdżoną tablicą i reprezentacją obiektu Payments
@@ -59,30 +70,31 @@ public class OwnerController extends HTTPHeaderUtils {
     public ResponseEntity<Optional<List<Payments>>> getOwnerPayment(@RequestParam("id") Integer id) {
         var payments = findOwnerById(id).map(Owner::getPayments);
         if(findOwnerById(id).isEmpty()) {
-            message.getInfo("V2 :: getOwnerPayment()", payments, "status", HttpStatus.NOT_FOUND);
+            message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             if (payments.toString().equals("Optional[[]]")) {
-                message.getInfo("V2 :: getOwnerPayment()", payments, "status", HttpStatus.NO_CONTENT);
+                message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.NO_CONTENT);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                message.getInfo("V2 :: getOwnerPayment()", payments, "status", HttpStatus.OK);
+                message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.OK);
                 return ResponseEntity.ok().body(payments);
             }
         }
     }
     /* Zwraca JSON-a reprezentację jednego obiektu użytkownika.
-    Zwraca kod 200 - OK lub kod 404 - NOT FOUND */
-    @GetMapping(params = "id")
-    public ResponseEntity<Optional<Owner>> getOwner(@RequestParam("id") Integer id) {
+    Zwraca kod 200 - OK lub kod 404 - NOT FOUND
+    Dodaje self-referencje do zasobu w postaci linku */
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityModel<Owner>> getOwner(@PathVariable("id") Integer id) {
         var filteredOwners = findOwnerById(id);
         if (findOwnerById(id).isEmpty()) {
-            message.getInfo("V2 :: getOwner()", filteredOwners, "status", HttpStatus.NOT_FOUND);
+            message.getInfo("V3 :: getOwner()", filteredOwners, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            message.getInfo("V2 :: getOwner()", filteredOwners, "status", HttpStatus.OK);
+            message.getInfo("V3 :: getOwner()", filteredOwners, "status", HttpStatus.OK);
             return ResponseEntity.ok()
-                    .body(filteredOwners);
+                    .body(filteredOwners.map(HateoasBuilder::mapToEnityModel).orElse(null));
         }
     }
     /* Zastępuje wartości obiektu Owner - w przypadku kolekcji w momencie zmiany pola pozostałe zmienia na null
@@ -93,7 +105,7 @@ public class OwnerController extends HTTPHeaderUtils {
         @PutMapping("/{id}")
         public ResponseEntity<?> replaceOwner(@PathVariable Integer id, @RequestBody Owner newOwner) {
             if (findOwnerById(id).isEmpty()) {
-                message.getInfo("V2 :: replaceOwner()", "status", HttpStatus.NOT_FOUND);
+                message.getInfo("V3 :: replaceOwner()", "status", HttpStatus.NOT_FOUND);
                 return ResponseEntity.notFound().build();
             } else {
                 findOwnerById(id).ifPresent(owner -> {
@@ -101,16 +113,16 @@ public class OwnerController extends HTTPHeaderUtils {
                     owner.setName(newOwner.getName());
                     owner.setSurname(newOwner.getSurname());
                     owner.setPayments(newOwner.getPayments());
-                    message.getInfo("V2 :: replaceOwner()", Collections.singletonList(owner), newOwner);
+                    message.getInfo("V3 :: replaceOwner()", Collections.singletonList(owner), newOwner);
                 });
-                message.getInfo("V2 :: replaceOwner()", "status", HttpStatus.OK);
+                message.getInfo("V3 :: replaceOwner()", "status", HttpStatus.OK);
                 return ResponseEntity.status(HttpStatus.OK).build();
             }
         }
         @PatchMapping("/{id}")
         public ResponseEntity<?> updateOwner(@PathVariable Integer id, @RequestBody Owner ownerValuesToReplace) {
             if (findOwnerById(id).isEmpty()) {
-                message.getInfo("V2 :: updateOwner()", "status", HttpStatus.NOT_FOUND);
+                message.getInfo("V3 :: updateOwner()", "status", HttpStatus.NOT_FOUND);
                 return ResponseEntity.notFound().build();
             } else {
                 findOwnerById(id).ifPresent(owner -> {
@@ -118,9 +130,9 @@ public class OwnerController extends HTTPHeaderUtils {
                     if(ownerValuesToReplace.getName() != null) owner.setName(ownerValuesToReplace.getName());
                     if(ownerValuesToReplace.getSurname() != null) owner.setSurname(ownerValuesToReplace.getSurname());
                     if(ownerValuesToReplace.getPayments() != null) owner.setPayments(ownerValuesToReplace.getPayments());
-                    message.getInfo("V2 :: updateOwner()", Collections.singletonList(owner), ownerValuesToReplace);
+                    message.getInfo("V3 :: updateOwner()", Collections.singletonList(owner), ownerValuesToReplace);
                 });
-                message.getInfo("V2 :: updateOwner()", "status", HttpStatus.OK);
+                message.getInfo("V3 :: updateOwner()", "status", HttpStatus.OK);
                 return ResponseEntity.status(HttpStatus.OK).build();
             }
         }
@@ -130,7 +142,7 @@ public class OwnerController extends HTTPHeaderUtils {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
     public void addOwner(@RequestBody Owner owner) {
-        message.getInfo("V2 :: addOwner()", owner, HttpStatus.CREATED);
+        message.getInfo("V3 :: addOwner()", owner, HttpStatus.CREATED);
         ownersList.add(owner);
     }
     /* JSON Dodaje płatność do utworzonego użytkownika, nie nadpisuje gotowych danych !
@@ -142,12 +154,12 @@ public class OwnerController extends HTTPHeaderUtils {
     Zwraca kod 201 - CREATED lub kod 404 - NOT FOUND */
     @PostMapping (value = "/id/{id}/payments")
     public ResponseEntity<Object> addPaymentToOwner(@PathVariable Integer id, @RequestBody Payments payment, @RequestHeader HttpHeaders headers) {
-        message.getInfo("V2 :: addPaymentToOwner()","params: ", "id: ", id, "payment: ", payment);
+        message.getInfo("V3 :: addPaymentToOwner()","params: ", "id: ", id, "payment: ", payment);
         if (findOwnerById(id).isEmpty()) {
-            message.getInfo("V2 :: addPaymentToOwner()", "status: " + HttpStatus.NOT_FOUND);
+            message.getInfo("V3 :: addPaymentToOwner()", "status: " + HttpStatus.NOT_FOUND);
             return ResponseEntity.notFound().build();
         } else {
-            message.getInfo("V2 :: addPaymentToOwner()", "status: " + HttpStatus.CREATED);
+            message.getInfo("V3 :: addPaymentToOwner()", "status: " + HttpStatus.CREATED);
             findOwnerById(id).ifPresent(owner -> owner.getPayments().add(payment));
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
@@ -156,12 +168,12 @@ public class OwnerController extends HTTPHeaderUtils {
     Zwraca kod 200 - OK lub kod 404 - NOT FOUND */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOwner(@PathVariable Integer id) {
-        message.getInfo("V2 :: deleteOwner()", "id: " + id);
+        message.getInfo("V3 :: deleteOwner()", "id: " + id);
         if(ownersList.removeIf(owner -> owner.getId().equals(id))) {
-            message.getInfo("V2 :: deleteOwner()", "status: " + HttpStatus.OK);
+            message.getInfo("V3 :: deleteOwner()", "status: " + HttpStatus.OK);
             return ResponseEntity.ok().build();
         } else {
-            message.getInfo("V2 :: deleteOwner()", "status: " + HttpStatus.NOT_FOUND);
+            message.getInfo("V3 :: deleteOwner()", "status: " + HttpStatus.NOT_FOUND);
             return ResponseEntity.notFound().build();
         }
     }
@@ -171,14 +183,6 @@ public class OwnerController extends HTTPHeaderUtils {
                 .filter(owner -> owner.getId().equals(id))
                 .findAny();
     }
-//    private Resource<Owner> HATEOAS_findOwnerById(Integer id) {
-//        return ownersList.stream()
-//                .filter(owner -> owner.getId().equals(id))
-//                .findAny().map(owner -> Resource<Owner> ownerResource =
-//                        new Resource<>(owner);
-//
-//                );
-//    }
     /* --------------------------------------------- */
 
 }

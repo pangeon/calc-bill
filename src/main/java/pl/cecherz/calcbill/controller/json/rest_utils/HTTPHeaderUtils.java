@@ -38,4 +38,6 @@ public class HTTPHeaderUtils {
         String URL = "http://" + Objects.requireNonNull(host).getHostName() + ":" + host.getPort();
         return ResponseEntity.ok(URL);
     }
+
 }
+
