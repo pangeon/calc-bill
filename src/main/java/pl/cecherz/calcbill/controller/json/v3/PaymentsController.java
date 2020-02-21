@@ -1,9 +1,19 @@
-package pl.cecherz.calcbill.controller.json.v2;
+package pl.cecherz.calcbill.controller.json.v3;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import pl.cecherz.calcbill.controller.json.rest_utils.HTTPHeaderUtils;
 import pl.cecherz.calcbill.model.json.Payments;
 import pl.cecherz.calcbill.utils.JsonDataManager;
@@ -15,11 +25,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v2/payments")
-@Component("PaymentsControllerJSON-V2")
+@RequestMapping("/api/v3/payments")
+@Component("PaymentsControllerJSON-V3")
 public class PaymentsController extends HTTPHeaderUtils {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
-    private MessageBuilder message = new MessageBuilder(pl.cecherz.calcbill.controller.json.v2.PaymentsController.class);
+    private MessageBuilder message = new MessageBuilder(PaymentsController.class);
 
     /* Dane zapisane w postaci listy przechowywane są tylko w pamięci tymczasowej */
     private List<Payments> paymentsList = JsonDataManager.initPayments();

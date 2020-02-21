@@ -1,4 +1,4 @@
-package pl.cecherz.calcbill.controller.json.v2;
+package pl.cecherz.calcbill.controller.json.rest_utils;
 
 import com.google.gson.Gson;
 import org.springframework.http.HttpHeaders;

@@ -1,22 +1,13 @@
-package pl.cecherz.calcbill.controller.json.v2;
+package pl.cecherz.calcbill.controller.json.v3;
 
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.cecherz.calcbill.controller.json.rest_utils.HTTPHeaderUtils;
 import pl.cecherz.calcbill.model.json.Owner;
 import pl.cecherz.calcbill.model.json.Payments;
@@ -32,11 +23,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/api/v2/owners")
-@Component("OwnerControllerJSON-V2")
+@RequestMapping("/api/v3/owners")
+@Component("OwnerControllerJSON-V3")
 public class OwnerController extends HTTPHeaderUtils {
     /* Wprowadzenie identyfikacji klasy dla narzędzia MessageBuilder */
-    private MessageBuilder message = new MessageBuilder(pl.cecherz.calcbill.controller.json.v2.OwnerController.class);
+    private MessageBuilder message = new MessageBuilder(OwnerController.class);
 
     /* Dane zapisane w postaci listy przechowywane są tylko w pamięci tymczasowej */
     private List<Owner> ownersList = JsonDataManager.initOwners();
@@ -90,7 +81,8 @@ public class OwnerController extends HTTPHeaderUtils {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
             message.getInfo("V2 :: getOwner()", filteredOwners, "status", HttpStatus.OK);
-            return ResponseEntity.ok().body(filteredOwners);
+            return ResponseEntity.ok()
+                    .body(filteredOwners);
         }
     }
     /* Zastępuje wartości obiektu Owner - w przypadku kolekcji w momencie zmiany pola pozostałe zmienia na null
@@ -179,6 +171,14 @@ public class OwnerController extends HTTPHeaderUtils {
                 .filter(owner -> owner.getId().equals(id))
                 .findAny();
     }
+//    private Resource<Owner> HATEOAS_findOwnerById(Integer id) {
+//        return ownersList.stream()
+//                .filter(owner -> owner.getId().equals(id))
+//                .findAny().map(owner -> Resource<Owner> ownerResource =
+//                        new Resource<>(owner);
+//
+//                );
+//    }
     /* --------------------------------------------- */
 
 }
