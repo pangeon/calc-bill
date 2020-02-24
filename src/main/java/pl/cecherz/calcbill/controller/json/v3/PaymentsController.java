@@ -1,5 +1,6 @@
 package pl.cecherz.calcbill.controller.json.v3;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.linkToPaymentId;
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.linkToPaymentSelf;
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.queryPaymentKind;
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.queryPaymentKindAndOwner;
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.queryPaymentOwnerAndAmountRange;
+
 @RestController
 @RequestMapping("/api/v3/payments")
 @Component("PaymentsControllerJSON-V3")
@@ -38,14 +45,23 @@ public class PaymentsController extends HTTPHeaderUtils {
 
     /* Zwraca JSON-a reprezentację kolekcji z obiektami płatności.
     Przechowuje informacje w cachu przez 5 minut */
-    @GetMapping()
-    public ResponseEntity<List<Payments>> getAllPayments() {
-        message.getInfo("V3 :: getAllPayments()", paymentsList);
-        return ResponseEntity.ok().header("Cache-Control", "max-age" + "=300").body(paymentsList);
+    @GetMapping
+    public ResponseEntity<CollectionModel<EntityModel<Payments>>> getAllPayments() {
+        CollectionModel<EntityModel<Payments>> collectionModel = new CollectionModel<>(
+                paymentsList.stream().map(HateoasBuilder::mapToEnityModel)
+                        .collect(Collectors.toList()));
+        linkToPaymentSelf(collectionModel, "self");
+        linkToPaymentId(collectionModel, "PaymentById", null);
+        queryPaymentKind(collectionModel, "PaymentByKind", null);
+        queryPaymentKindAndOwner(collectionModel, "PaymentsByOwnerIdAndKind", null, null);
+        queryPaymentOwnerAndAmountRange(collectionModel, "PaymentsByOwnerIdAndAmonutRange", null, null, null);
+        message.getInfo("V3 :: getAllPayments()", collectionModel);
+        return ResponseEntity.ok().header("Cache-Control", "max-age" + "=300")
+                .body(collectionModel);
     }
     /* Zwraca JSON-a reprezentację jednego obiektu płatności z kolekcji. */
-    @GetMapping(params = "id")
-    public ResponseEntity<EntityModel<Payments>> getPayment(@RequestParam("id") Integer id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<EntityModel<Payments>> getPayment(@PathVariable("id") Integer id) {
         var filteredPayments = findPaymentById(id);
         if (findPaymentById(id).isEmpty()) {
             message.getInfo("V3 :: getPayment()", filteredPayments, "status", HttpStatus.NOT_FOUND);

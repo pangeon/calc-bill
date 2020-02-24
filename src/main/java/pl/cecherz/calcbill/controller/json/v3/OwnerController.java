@@ -1,5 +1,6 @@
 package pl.cecherz.calcbill.controller.json.v3;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.linkToOwnerId;
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.linkToOwnerSelf;
+
 @RestController
 @RequestMapping("/api/v3/owners")
 @Component("OwnerControllerJSON-V3")
@@ -46,9 +50,15 @@ public class OwnerController extends HTTPHeaderUtils {
     /* Zwraca JSON-a reprezentację kolekcji z obiektami użytkowników.
     Przechowuje informacje w cachu przez 5 minut */
     @GetMapping
-    public ResponseEntity<List<Owner>> getAllOwners() {
-        message.getInfo("V3 :: getAllOwners()", ownersList);
-        return ResponseEntity.ok().header("Cache-Control", "max-age" + "=300").body(ownersList);
+    public ResponseEntity<CollectionModel<EntityModel<Owner>>> getAllOwners() {
+        CollectionModel<EntityModel<Owner>> collectionModel = new CollectionModel<>(
+                ownersList.stream().map(HateoasBuilder::mapToEnityModel)
+                        .collect(Collectors.toList()));
+        linkToOwnerSelf(collectionModel, "self");
+        linkToOwnerId(collectionModel, "ownerById", null);
+        message.getInfo("V3 :: getAllOwners()", collectionModel);
+        return ResponseEntity.ok().header("Cache-Control", "max-age" + "=300")
+                .body(collectionModel);
     }
     /* Zwraca listę użytkowników (imię i nazwisko) w postaci HTML-a */
     @GetMapping(produces = MediaType.TEXT_HTML_VALUE, params = {"color", "fontsize"})
@@ -67,13 +77,13 @@ public class OwnerController extends HTTPHeaderUtils {
     /* Zwraca JSON-a wartość jednego pola będącego zagnieżdżoną tablicą i reprezentacją obiektu Payments
     Zwraca kod 200 - OK, 204 - NO CONTENT, kod 404 - NOT FOUND */
     @GetMapping(value = "/payments", params = "id")
-    public ResponseEntity<Optional<List<Payments>>> getOwnerPayment(@RequestParam("id") Integer id) {
-        var payments = findOwnerById(id).map(Owner::getPayments);
-        if(findOwnerById(id).isEmpty()) {
-            message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.NOT_FOUND);
+    public ResponseEntity<List<Payments>> getOwnerPayment(@RequestParam("id") Integer id) {
+        var payments = findOwnerById(id).map(Owner::getPayments).orElse(null);
+        if(payments == null) {
+            message.getInfo("V3 :: getOwnerPayment()", null, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            if (payments.toString().equals("Optional[[]]")) {
+            if (payments.toString().equals("[]")) {
                 message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.NO_CONTENT);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
@@ -88,7 +98,7 @@ public class OwnerController extends HTTPHeaderUtils {
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Owner>> getOwner(@PathVariable("id") Integer id) {
         var filteredOwners = findOwnerById(id);
-        if (findOwnerById(id).isEmpty()) {
+        if (filteredOwners.isEmpty()) {
             message.getInfo("V3 :: getOwner()", filteredOwners, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
