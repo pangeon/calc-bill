@@ -2,23 +2,11 @@ package pl.cecherz.calcbill.controller.json.v3;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.cecherz.calcbill.controller.json.rest_utils.HTTPHeaderUtils;
 import pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder;
 import pl.cecherz.calcbill.model.json.Owner;
@@ -48,6 +36,7 @@ public class OwnerController extends HTTPHeaderUtils {
     private List<Owner> ownersList = JsonDataManager.initOwners();
 
     /* Zwraca JSON-a reprezentację kolekcji z obiektami użytkowników.
+    Dodaje linki: self-referencja, metoda getOwner
     Przechowuje informacje w cachu przez 5 minut */
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<Owner>>> getAllOwners() {
@@ -78,17 +67,17 @@ public class OwnerController extends HTTPHeaderUtils {
     Zwraca kod 200 - OK, 204 - NO CONTENT, kod 404 - NOT FOUND */
     @GetMapping(value = "/payments", params = "id")
     public ResponseEntity<List<Payments>> getOwnerPayment(@RequestParam("id") Integer id) {
-        var payments = findOwnerById(id).map(Owner::getPayments).orElse(null);
-        if(payments == null) {
-            message.getInfo("V3 :: getOwnerPayment()", null, "status", HttpStatus.NOT_FOUND);
+        var ownerPayments = getOwnerPayments(id);
+        if(ownerPayments.isEmpty()) {
+            message.getInfo("V3 :: getOwnerPayment()", ownerPayments, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            if (payments.toString().equals("[]")) {
-                message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.NO_CONTENT);
+            if (ownerPayments.toString().equals("Optional[[]]")) {
+                message.getInfo("V3 :: getOwnerPayment()", ownerPayments, "status", HttpStatus.NO_CONTENT);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
             } else {
-                message.getInfo("V3 :: getOwnerPayment()", payments, "status", HttpStatus.OK);
-                return ResponseEntity.ok().body(payments);
+                message.getInfo("V3 :: getOwnerPayment()", ownerPayments, "status", HttpStatus.OK);
+                return ResponseEntity.ok().body(ownerPayments.orElse(null));
             }
         }
     }
@@ -163,7 +152,7 @@ public class OwnerController extends HTTPHeaderUtils {
     { "id": 3, "kind": "home", "amount": 20.0, "date": null }
     Zwraca kod 201 - CREATED lub kod 404 - NOT FOUND */
     @PostMapping (value = "/id/{id}/payments")
-    public ResponseEntity<Object> addPaymentToOwner(@PathVariable Integer id, @RequestBody Payments payment, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Object> addPaymentToOwner(@PathVariable Integer id, @RequestBody Payments payment) {
         message.getInfo("V3 :: addPaymentToOwner()","params: ", "id: ", id, "payment: ", payment);
         if (findOwnerById(id).isEmpty()) {
             message.getInfo("V3 :: addPaymentToOwner()", "status: " + HttpStatus.NOT_FOUND);
@@ -192,6 +181,9 @@ public class OwnerController extends HTTPHeaderUtils {
         return ownersList.stream()
                 .filter(owner -> owner.getId().equals(id))
                 .findAny();
+    }
+    private Optional<List<Payments>> getOwnerPayments(Integer id) {
+        return findOwnerById(id).map(Owner::getPayments);
     }
     /* --------------------------------------------- */
 

@@ -5,17 +5,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.cecherz.calcbill.controller.json.rest_utils.HTTPHeaderUtils;
 import pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder;
 import pl.cecherz.calcbill.model.json.Payments;
@@ -27,11 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.linkToPaymentId;
-import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.linkToPaymentSelf;
-import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.queryPaymentKind;
-import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.queryPaymentKindAndOwner;
-import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.queryPaymentOwnerAndAmountRange;
+import static pl.cecherz.calcbill.controller.json.rest_utils.HateoasBuilder.*;
 
 @RestController
 @RequestMapping("/api/v3/payments")
@@ -47,7 +33,7 @@ public class PaymentsController extends HTTPHeaderUtils {
     Przechowuje informacje w cachu przez 5 minut */
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<Payments>>> getAllPayments() {
-        CollectionModel<EntityModel<Payments>> collectionModel = new CollectionModel<>(
+        var collectionModel = new CollectionModel<>(
                 paymentsList.stream().map(HateoasBuilder::mapToEnityModel)
                         .collect(Collectors.toList()));
         linkToPaymentSelf(collectionModel, "self");
@@ -74,36 +60,57 @@ public class PaymentsController extends HTTPHeaderUtils {
     /* Metody odpowiedzialne za filtrowanie danych
     Zwraca kod 200 - OK lub kod 404 - NOT FOUND */
     @GetMapping(params = "kind")
-    public ResponseEntity<List<Payments>> filterPaymentsByKind(@RequestParam("kind") String kind) {
-        var payments = findPaymentsByKind(kind);
-        if(payments.isEmpty()) {
-            message.getInfo("V3 :: filterPaymentsByKind()", payments, "status", HttpStatus.NOT_FOUND);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    public ResponseEntity<CollectionModel<EntityModel<Payments>>> filterPaymentsByKind(@RequestParam("kind") String kind) {
+        var checkPayments = findPaymentsByKind(kind);
+        var collectionModel = new CollectionModel<>(
+                paymentsList.stream().filter(
+                        payments -> kind.equals(payments.getKind())
+                ).map(HateoasBuilder::mapToEnityModel).collect(Collectors.toList())
+        );
+        linkToPaymentSelf(collectionModel, "allPayments");
+        queryPaymentKind(collectionModel, "self", kind);
+        if(checkPayments.isEmpty()) {
+            message.getInfo("V3 :: filterPaymentsByKind()", collectionModel, "status", HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         } else {
-            message.getInfo("V3 :: filterPaymentsByKind()", payments, "status", HttpStatus.OK);
-            return ResponseEntity.ok().body(payments);
+            message.getInfo("V3 :: filterPaymentsByKind()", collectionModel, "status", HttpStatus.OK);
+            return ResponseEntity.ok().body(collectionModel);
         }
     }
     @GetMapping(params = {"owner_id", "kind"})
-    public ResponseEntity<List<Payments>> filterPaymentsByKindAndOwnerId(@RequestParam("owner_id") Integer owner_id, @RequestParam("kind") String kind) {
-        var payments = findPaymentsByKindAndOwnerId(owner_id, kind);
-        if (payments.isEmpty()) {
-            message.getInfo("V3 ::filterPaymentsByKindAndOwnerId()", payments, "status", HttpStatus.NOT_FOUND);
+    public ResponseEntity<CollectionModel<EntityModel<Payments>>> filterPaymentsByKindAndOwnerId(@RequestParam("owner_id") Integer owner_id, @RequestParam("kind") String kind) {
+        var checkPayments = findPaymentsByKindAndOwnerId(owner_id, kind);
+        var collectionModel = new CollectionModel<>(
+                paymentsList.stream().filter(
+                        payments -> kind.equals(payments.getKind()) && (owner_id.equals(payments.getOwnerId()))
+                ).map(HateoasBuilder::mapToEnityModel).collect(Collectors.toList())
+        );
+        linkToPaymentSelf(collectionModel, "allPayments");
+        queryPaymentKindAndOwner(collectionModel, "self", owner_id, kind);
+        if (checkPayments.isEmpty()) {
+            message.getInfo("V3 ::filterPaymentsByKindAndOwnerId()", checkPayments, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            message.getInfo("V3 ::filterPaymentsByKindAndOwnerId()", payments, "status", HttpStatus.OK);
-            return ResponseEntity.ok().body(payments);
+            message.getInfo("V3 ::filterPaymentsByKindAndOwnerId()", checkPayments, "status", HttpStatus.OK);
+            return ResponseEntity.ok().body(collectionModel);
         }
     }
     @GetMapping(params = {"owner_id", "min", "max"})
-    public ResponseEntity<List<Payments>> filterPaymentsByOwnerIdAndAmonutRange(@RequestParam("owner_id") Integer owner_id, @RequestParam("min") Double min, @RequestParam("max") Double max) {
-        var payments = findPaymentsByOwnerIdAndRange(owner_id, min, max);
-        if (payments.isEmpty()) {
-            message.getInfo("V3 :: filterPaymentsByOwnerIdAndAmonutRange()", payments, "status", HttpStatus.NOT_FOUND);
+    public ResponseEntity<CollectionModel<EntityModel<Payments>>> filterPaymentsByOwnerIdAndAmonutRange(@RequestParam("owner_id") Integer owner_id, @RequestParam("min") Double min, @RequestParam("max") Double max) {
+        var checkPayments = findPaymentsByOwnerIdAndRange(owner_id, min, max);
+        var collectionModel = new CollectionModel<>(
+                paymentsList.stream().filter(
+                        payments -> owner_id.equals(payments.getOwnerId()) && (min < payments.getAmount()) && (max > payments.getAmount())
+                ).map(HateoasBuilder::mapToEnityModel).collect(Collectors.toList())
+        );
+        linkToPaymentSelf(collectionModel, "allPayments");
+        queryPaymentOwnerAndAmountRange(collectionModel, "self", owner_id, min, max);
+        if (checkPayments.isEmpty()) {
+            message.getInfo("V3 :: filterPaymentsByOwnerIdAndAmonutRange()", checkPayments, "status", HttpStatus.NOT_FOUND);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            message.getInfo("V3 :: filterPaymentsByOwnerIdAndAmonutRange()", payments, "status", HttpStatus.OK);
-            return ResponseEntity.ok().body(payments);
+            message.getInfo("V3 :: filterPaymentsByOwnerIdAndAmonutRange()", checkPayments, "status", HttpStatus.OK);
+            return ResponseEntity.ok().body(collectionModel);
         }
     }
     /* --------------------------------------------- */
