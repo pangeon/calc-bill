@@ -1,6 +1,11 @@
-INSERT INTO owner       (id, name, surname)                 VALUES (1, "Kamil", "Cecherz");
-INSERT INTO owner       (id, name, surname)                 VALUES (2, "Agnieszka", "Lasota");
-INSERT INTO payments    (id, amount, kind, owner_JSON_id)        VALUES (1, 230.33, "Pendrive", 1);
-INSERT INTO payments    (id, amount, kind, owner_JSON_id)        VALUES (2, 980.00, "Kanapa narożna", 2);
-INSERT INTO payments    (id, amount, kind, owner_JSON_id)        VALUES (3, 30.33, "Boczek wędzony", 2);
-INSERT INTO payments    (id, amount, kind, owner_JSON_id)        VALUES (4, 13.04, "Żarówki LED 300W", 1);
+INSERT INTO owner       (id, name, surname)                 VALUES (1, 'Kamil', 'Cecherz');
+INSERT INTO owner       (id, name, surname)                 VALUES (2, 'Łukasz', 'Bednarski');
+INSERT INTO owner       (id, name, surname)                 VALUES (3, 'Roman', 'Giertych');
+INSERT INTO owner       (id, name, surname)                 VALUES (4, 'Adam', 'Małysz');
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (1, 230.33, 'car', '2018-01-01T12:10:09.805+0000', 1);
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (2, 980.00, 'home', '2019-07-04T13:33:03.969+0000', 2);
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (3, 30.33, 'medicine', '2013-07-04T18:37:02.988+0000', 2);
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (4, 13.04, 'car', '2015-09-04T98:39:02.988+0000', 1);
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (5, 122.88, 'shopping', '2012-01-04T98:10:03.990+0000', 3);
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (6, 5.88, 'shopping', '2019-05-11T98:10:03.990+0000', 3);
+INSERT INTO payments    (id, amount, kind, date, owner_id)        VALUES (7, 228.77, 'home', '2013-07-04T18:37:02.988+0000', 3);

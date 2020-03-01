@@ -10,6 +10,19 @@ import pl.cecherz.calcbill.utils.MessageBuilder;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * Klasa ma zastosowanie w przypadku odwoływania się do całego zbioru płatność bez uwzględnienia podziału na posiadaczy.
+ *
+ * Metody
+ * --------
+ * getAllPayments()
+ * getPayment({id})
+ * filterPaymentsByKind(? kind)
+ * filterPaymentsByOwnerIdAndAmonutRang(? min max)
+ * addPayment({id}) -- tworzy relacje na poziomie bazy danych
+ * deletePayment({id})
+ */
+
 @RestController
 @RequestMapping("/api/db/payments")
 @Component("PaymentsControllerDB")
@@ -25,9 +38,9 @@ public class PaymentsController {
         message.getInfo("getAllPayments()", paymentsRepository.findAll());
         return paymentsRepository.findAll();
     }
-    /* Metody zawsze zwracają jeden obiekt gdyż nie widzą relacji */
     @GetMapping("/{id}")
-    public Payments getPayment(@PathVariable Integer id) {
+    public Payments getPayment(
+            @PathVariable Integer id) {
         if (paymentsRepository.findPaymentById(id) == null) {
             throw new NullPointerException();
         }
@@ -35,7 +48,8 @@ public class PaymentsController {
         return paymentsRepository.findPaymentById(id);
     }
     @GetMapping(params = "kind")
-    public Iterable<Payments> filterPaymentsByKind(@RequestParam("kind") String kind) {
+    public Iterable<Payments> filterPaymentsByKind(
+            @RequestParam("kind") String kind) {
         if (paymentsRepository.findPaymentsByKind(kind) == null) {
             throw new NullPointerException();
         }
@@ -51,12 +65,19 @@ public class PaymentsController {
         return paymentsList;
     }
     @PostMapping("/{id}")
-    void addPayment(@RequestBody Payments body, @PathVariable Integer id) {
+    void addPayment(
+            @RequestBody Payments body,
+            @PathVariable Integer id) {
         message.getInfo("addPayment()", body);
         Owner owner = new Owner();
         owner.setId(id);
         body.setOwnerId(owner);
         body.setDate(new Timestamp(System.currentTimeMillis()));
         paymentsRepository.save(body);
+    }
+    @DeleteMapping("/{id}")
+    void deletePayment(@PathVariable Integer id) {
+        message.getInfo("deletePayment()", paymentsRepository.findPaymentById(id));
+        paymentsRepository.delete(paymentsRepository.findPaymentById(id));
     }
 }
