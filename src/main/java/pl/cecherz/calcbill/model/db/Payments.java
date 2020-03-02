@@ -49,7 +49,7 @@ public class Payments implements Serializable {
         this.date = date;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

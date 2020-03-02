@@ -10,6 +10,7 @@ import pl.cecherz.calcbill.utils.MessageBuilder;
 import pl.cecherz.calcbill.utils.PaymentsCalculator;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -97,12 +98,40 @@ public class OwnerController {
         return sum;
     }
     @PostMapping()
-    void addOwner(@RequestBody Owner body) {
+    public void addOwner(@RequestBody Owner body) {
         message.getInfo("addOwner()", body);
         ownerRepository.save(body);
     }
+    @PutMapping("/{id}")
+    public void replaceOwner(
+            @PathVariable Integer id,
+            @RequestBody Owner newOwner) {
+        Optional<Owner> ownerValuesToReplace = ownerRepository.findById(id);
+        message.getInfo("start :: replaceOwner()", ownerValuesToReplace);
+        ownerValuesToReplace.ifPresent(owner -> {
+            owner.setId(id);
+            owner.setName(newOwner.getName());
+            owner.setSurname(newOwner.getSurname());
+        });
+        ownerRepository.save(ownerValuesToReplace.orElse(null));
+        message.getInfo("end :: replaceOwner()", newOwner);
+    }
+    @PatchMapping("/{id}")
+    public void updateOwner(
+            @PathVariable Integer id,
+            @RequestBody Owner ownerToUpdate) {
+        Optional<Owner> ownerValuesToUpdate = ownerRepository.findById(id);
+        message.getInfo("start :: updateOwner()", ownerValuesToUpdate);
+        ownerValuesToUpdate.ifPresent(owner -> {
+            if(ownerToUpdate.getId() != null) owner.setId(id);
+            if(ownerToUpdate.getName() != null) owner.setName(ownerToUpdate.getName());
+            if(ownerToUpdate.getSurname() != null) owner.setSurname(ownerToUpdate.getSurname());
+        });
+        ownerRepository.save(ownerValuesToUpdate.orElse(null));
+        message.getInfo("end :: updateOwner()", ownerValuesToUpdate);
+    }
     @DeleteMapping("/{id}")
-    void deleteOwner(@PathVariable Integer id) {
+    public void deleteOwner(@PathVariable Integer id) {
         message.getInfo("deleteOwner()", ownerRepository.findOwnerById(id));
         ownerRepository.delete(ownerRepository.findOwnerById(id));
     }

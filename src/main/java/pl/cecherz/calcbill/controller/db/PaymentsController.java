@@ -9,6 +9,7 @@ import pl.cecherz.calcbill.utils.MessageBuilder;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Klasa ma zastosowanie w przypadku odwoływania się do całego zbioru płatność bez uwzględnienia podziału na posiadaczy.
@@ -65,7 +66,7 @@ public class PaymentsController {
         return paymentsList;
     }
     @PostMapping("/{id}")
-    void addPayment(
+    public void addPayment(
             @RequestBody Payments body,
             @PathVariable Integer id) {
         message.getInfo("addPayment()", body);
@@ -74,6 +75,34 @@ public class PaymentsController {
         body.setOwnerId(owner);
         body.setDate(new Timestamp(System.currentTimeMillis()));
         paymentsRepository.save(body);
+    }
+    @PutMapping("/{id}")
+    public void replacePayment(@PathVariable Integer id, @RequestBody Payments newPayment) {
+        Optional<Payments> paymentsValuesToReplace = paymentsRepository.findById(id);
+        message.getInfo("start :: replacePayments()", paymentsValuesToReplace);
+        paymentsValuesToReplace.ifPresent(payment -> {
+            payment.setId(id);
+            payment.setAmount(newPayment.getAmount());
+            payment.setKind(newPayment.getKind());
+            payment.setDate(new Timestamp(System.currentTimeMillis()));
+        });
+        paymentsRepository.save(paymentsValuesToReplace.orElse(null));
+        message.getInfo("end :: replacePayments()", newPayment);
+    }
+    @PatchMapping("/{id}")
+    public void updatePayment(
+            @PathVariable Integer id,
+            @RequestBody Payments paymentToUpdate) {
+        Optional<Payments> paymentValuesToUpdate = paymentsRepository.findById(id);
+        message.getInfo("start :: updatePayment()", paymentValuesToUpdate);
+        paymentValuesToUpdate.ifPresent(payment -> {
+            if(paymentToUpdate.getId() != null) payment.setId(id);
+            if(paymentToUpdate.getAmount() != null) payment.setAmount(paymentToUpdate.getAmount());
+            if(paymentToUpdate.getKind() != null) payment.setKind(paymentToUpdate.getKind());
+            payment.setDate(new Timestamp(System.currentTimeMillis()));
+        });
+        paymentsRepository.save(paymentValuesToUpdate.orElse(null));
+        message.getInfo("end :: updatePayment()", paymentValuesToUpdate);
     }
     @DeleteMapping("/{id}")
     void deletePayment(@PathVariable Integer id) {
