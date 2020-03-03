@@ -1,8 +1,13 @@
 package pl.cecherz.calcbill.controller.db;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import pl.cecherz.calcbill.exeptions.EmptyFindResultException;
+import pl.cecherz.calcbill.exeptions.EntityEmptyContentException;
+import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
+import pl.cecherz.calcbill.exeptions.RestExceptionHandler;
 import pl.cecherz.calcbill.model.db.Owner;
 import pl.cecherz.calcbill.model.db.Payments;
 import pl.cecherz.calcbill.repositories.OwnerRepository;
@@ -33,7 +38,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/db/owners")
 @Component("OwnerControllerDB")
-public class OwnerController {
+public class OwnerController extends RestExceptionHandler {
     private MessageBuilder message = new MessageBuilder(OwnerController.class);
     private final OwnerRepository ownerRepository;
 
@@ -48,26 +53,35 @@ public class OwnerController {
     @GetMapping("/{id}")
     public Owner getOwner(
             @PathVariable Integer id) {
-        if (ownerRepository.findOwnerById(id) == null) {
-            throw new NullPointerException();
-        }
-        message.getInfo("getOwner()", ownerRepository.findOwnerById(id));
-        return ownerRepository.findOwnerById(id);
+        Owner owner = ownerRepository.findOwnerById(id);
+        if (owner == null) throw new EntityNotFoundException(id);
+        message.getInfo("getOwner()", owner, "status", HttpStatus.OK);
+        return owner;
     }
     @GetMapping("/{id}/payments")
     public List<Payments> getOwnerPayments(
             @PathVariable Integer id) {
-        final List<Payments> payments = ownerRepository.findOwnerById(id).getPayments();
-        message.getInfo("getOwnerPayments()", payments);
-        return payments;
+        Owner owner = ownerRepository.findOwnerById(id);
+        if (owner == null) throw new EntityNotFoundException(id);
+
+        List<Payments> ownerPayments = owner.getPayments();
+        if (ownerPayments.isEmpty()) throw new EntityEmptyContentException(id);
+
+        message.getInfo("getOwnerPayments()", ownerPayments);
+        return ownerPayments;
     }
     @GetMapping("/{id}/payments/{kind}")
     public List<Payments> getOwnerPaymentsByKind(
             @PathVariable Integer id,
             @PathVariable String kind) {
-        final List<Payments> ownerPaymentsByKind = ownerRepository.findOwnerById(id).getPayments()
+        Owner owner = ownerRepository.findOwnerById(id);
+        if (owner == null) throw new EntityNotFoundException(id);
+
+        final List<Payments> ownerPaymentsByKind = owner.getPayments()
                 .stream().filter(payment -> payment.getKind().equals(kind))
                 .collect(Collectors.toList());
+        if (ownerPaymentsByKind.isEmpty()) throw new EmptyFindResultException(id, kind);
+
         message.getInfo("getOwnerPaymentsByKind()", ownerPaymentsByKind);
         return ownerPaymentsByKind;
     }
@@ -76,11 +90,16 @@ public class OwnerController {
             @PathVariable Integer id,
             @PathVariable Double min,
             @PathVariable Double max) {
-        final List<Payments> ownerPaymentsByKind = ownerRepository.findOwnerById(id).getPayments()
+        Owner owner = ownerRepository.findOwnerById(id);
+        if (owner == null) throw new EntityNotFoundException(id);
+
+        final List<Payments> ownerPaymentsByAmountRange = ownerRepository.findOwnerById(id).getPayments()
                 .stream().filter(payment -> payment.getAmount() > min && payment.getAmount() < max)
                 .collect(Collectors.toList());
-        message.getInfo("getOwnerPaymentsByAmonutRange()", ownerPaymentsByKind);
-        return ownerPaymentsByKind;
+        String range = min + " - " + max;
+        if(ownerPaymentsByAmountRange.isEmpty()) throw new EmptyFindResultException(id, range);
+        message.getInfo("getOwnerPaymentsByAmonutRange()", ownerPaymentsByAmountRange);
+        return ownerPaymentsByAmountRange;
     }
     @GetMapping(value = "/{id}/payments/sum", produces = MediaType.APPLICATION_JSON_VALUE)
     public Double getSumOwnerPayments(
@@ -98,6 +117,7 @@ public class OwnerController {
         return sum;
     }
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public void addOwner(@RequestBody Owner body) {
         message.getInfo("addOwner()", body);
         ownerRepository.save(body);

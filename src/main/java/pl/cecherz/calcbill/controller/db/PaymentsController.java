@@ -2,6 +2,8 @@ package pl.cecherz.calcbill.controller.db;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
+import pl.cecherz.calcbill.exeptions.RestExceptionHandler;
 import pl.cecherz.calcbill.model.db.Owner;
 import pl.cecherz.calcbill.model.db.Payments;
 import pl.cecherz.calcbill.repositories.PaymentsRepository;
@@ -27,7 +29,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/db/payments")
 @Component("PaymentsControllerDB")
-public class PaymentsController {
+public class PaymentsController extends RestExceptionHandler {
     private MessageBuilder message = new MessageBuilder(PaymentsController.class);
     private final PaymentsRepository paymentsRepository;
 
@@ -42,14 +44,13 @@ public class PaymentsController {
     @GetMapping("/{id}")
     public Payments getPayment(
             @PathVariable Integer id) {
-        if (paymentsRepository.findPaymentById(id) == null) {
-            throw new NullPointerException();
-        }
-        message.getInfo("getPayment()", paymentsRepository.findPaymentById(id));
-        return paymentsRepository.findPaymentById(id);
+        Payments payment = paymentsRepository.findPaymentById(id);
+        if (payment == null) throw new EntityNotFoundException(id);
+        message.getInfo("getPayment()", payment);
+        return payment;
     }
     @GetMapping(params = "kind")
-    public Iterable<Payments> filterPaymentsByKind(
+    public List<Payments> filterPaymentsByKind(
             @RequestParam("kind") String kind) {
         if (paymentsRepository.findPaymentsByKind(kind) == null) {
             throw new NullPointerException();
