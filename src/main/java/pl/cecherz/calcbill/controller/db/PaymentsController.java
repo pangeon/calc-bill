@@ -25,7 +25,10 @@ import java.util.Optional;
  * getPayment({id})
  * filterPaymentsByKind(? kind)
  * filterPaymentsByOwnerIdAndAmonutRang(? min max)
+ *
  * addPayment({id}) -- tworzy relacje na poziomie bazy danych
+ * replacePayment({id})
+ * updatePayment({id})
  * deletePayment({id})
  */
 
@@ -122,7 +125,7 @@ public class PaymentsController extends RestExceptionHandler {
     void deletePayment(@PathVariable Integer id) {
         Payments paymentToDelete = paymentsRepository.findPaymentById(id);
         if(paymentToDelete == null) throw new EntityNotFoundException(id);
-        message.getInfo("deletePayment()", paymentsRepository.findPaymentById(id));
-        paymentsRepository.delete(paymentsRepository.findPaymentById(id));
+        message.getInfo("deletePayment()", paymentToDelete);
+        paymentsRepository.delete(paymentToDelete);
     }
 }

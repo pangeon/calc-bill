@@ -32,8 +32,12 @@ import java.util.stream.Collectors;
  * getOwnerPaymentsByAmonutRange(/{id}/payments/{min}/{max})
  * getSumOwnerPayments(/{id}/payments/sum)
  * getSumOwnerPaymentsByKind(/{id}/payments/sum/{kind})
+ *
  * addOwner()
+ * updateOwner({id})
+ * replaceOwner({id})
  * deleteOwner({id}) - usuwa dane z bazy: tabele Owner i Payments
+ *
  */
 @RestController
 @RequestMapping("/api/db/owners")

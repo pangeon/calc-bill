@@ -25,7 +25,8 @@ public class Owner implements Serializable {
     @JsonManagedReference
     @OneToMany(mappedBy = "ownerId",
             fetch = FetchType.EAGER,
-            cascade = CascadeType.ALL)
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true)
     private List<Payments> payments;
 
     @Column(name = "NAME", nullable = false, columnDefinition = "TEXT")
@@ -79,17 +80,17 @@ public class Owner implements Serializable {
     public void setSurname(String surname) {
         this.surname = surname;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Owner)) return false;
         Owner owner = (Owner) o;
-        return getId() == owner.getId() &&
-                Objects.equals(getPayments(), owner.getPayments()) &&
-                Objects.equals(getName(), owner.getName()) &&
-                Objects.equals(getSurname(), owner.getSurname());
+        return getId().equals(owner.getId()) &&
+                getPayments().equals(owner.getPayments()) &&
+                getName().equals(owner.getName()) &&
+                getSurname().equals(owner.getSurname());
     }
-
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getPayments(), getName(), getSurname());

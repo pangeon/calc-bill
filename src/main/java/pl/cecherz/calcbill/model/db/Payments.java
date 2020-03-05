@@ -2,16 +2,7 @@ package pl.cecherz.calcbill.model.db;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -94,18 +85,16 @@ public class Payments implements Serializable {
         if (this == o) return true;
         if (!(o instanceof Payments)) return false;
         Payments payments = (Payments) o;
-        return getId() == payments.getId() &&
-                Double.compare(payments.getAmount(), getAmount()) == 0 &&
+        return getId().equals(payments.getId()) &&
+                getOwnerId().equals(payments.getOwnerId()) &&
                 getKind().equals(payments.getKind()) &&
+                getAmount().equals(payments.getAmount()) &&
                 getDate().equals(payments.getDate());
     }
-
     @Override
     public int hashCode() {
-        return Objects.hash(getId(),
-                getKind(), getAmount(), getDate());
+        return Objects.hash(getId(), getOwnerId(), getKind(), getAmount(), getDate());
     }
-
     @Override
     public String toString() {
         return "Payments{" +
