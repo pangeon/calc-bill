@@ -27,7 +27,21 @@ public class RestExceptionHandler {
     protected HTTPError isFindResultEmpty(EmptyFindResultException e) {
         Integer entityId = e.getEntityId();
         String findResult = e.getFindResult();
-        message.getInfo("isEntityEmpty()", entityId, "status", HttpStatus.OK);
-        return new HTTPError(200, "Entity id [" + entityId + "] exist. There are no matching set of results ["+ findResult + "]");
+        message.getInfo("isEntityResultEmpty()", entityId, "status", HttpStatus.OK);
+        if(entityId != null) {
+            return new HTTPError(200, "Entity id [" + entityId + "] exist. There are no matching set of results [" + findResult + "]");
+        } else {
+            return new HTTPError(200, "There are no matching set of results [" + findResult + "]");
+        }
+    }
+    @ExceptionHandler(DataIntegrityException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    protected HTTPError validateDataIntegrity(DataIntegrityException e) {
+        Integer entityId = e.getEntityId();
+        String infoMessage = "Entity id [" + entityId + "] not exist in related collection !";
+        String cause = e.getExceptionCause();
+        String exceptionMessage = e.getExceptionMessage();
+        message.getInfo("checkDataIntegrity()", "message", infoMessage, "status", HttpStatus.UNPROCESSABLE_ENTITY);
+        return new HTTPError(422, infoMessage, cause, exceptionMessage);
     }
 }

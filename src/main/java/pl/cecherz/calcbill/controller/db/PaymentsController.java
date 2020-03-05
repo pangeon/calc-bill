@@ -1,7 +1,10 @@
 package pl.cecherz.calcbill.controller.db;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import pl.cecherz.calcbill.exeptions.DataIntegrityException;
+import pl.cecherz.calcbill.exeptions.EmptyFindResultException;
 import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
 import pl.cecherz.calcbill.exeptions.RestExceptionHandler;
 import pl.cecherz.calcbill.model.db.Owner;
@@ -52,34 +55,43 @@ public class PaymentsController extends RestExceptionHandler {
     @GetMapping(params = "kind")
     public List<Payments> filterPaymentsByKind(
             @RequestParam("kind") String kind) {
-        if (paymentsRepository.findPaymentsByKind(kind) == null) {
-            throw new NullPointerException();
-        }
-        message.getInfo("filterPaymentsByKind()", paymentsRepository.findPaymentsByKind(kind));
-        return paymentsRepository.findPaymentsByKind(kind);
+        List<Payments> paymentsByKind = paymentsRepository.findPaymentsByKind(kind);
+        message.getInfo("filterPaymentsByKind()", paymentsByKind);
+
+        if (paymentsByKind.isEmpty()) throw new EmptyFindResultException(kind);
+        return paymentsByKind;
     }
     @GetMapping(params = {"min", "max"})
     public List<Payments> filterPaymentsByOwnerIdAndAmonutRange(
             @RequestParam("min") Double min,
             @RequestParam("max") Double max) {
-        List<Payments> paymentsList = paymentsRepository.findPaymentsByAmountBetween(min, max);
-        message.getInfo("filterPaymentsByOwnerIdAndAmonutRange()", paymentsList);
-        return paymentsList;
+        List<Payments> paymentsByAmount = paymentsRepository.findPaymentsByAmountBetween(min, max);
+        message.getInfo("filterPaymentsByOwnerIdAndAmonutRange()", paymentsByAmount);
+
+        String range = min + " - " + max;
+        if (paymentsByAmount.isEmpty()) throw new EmptyFindResultException(range);
+        return paymentsByAmount;
     }
     @PostMapping("/{id}")
-    public void addPayment(
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addPayment (
             @RequestBody Payments body,
             @PathVariable Integer id) {
-        message.getInfo("addPayment()", body);
         Owner owner = new Owner();
         owner.setId(id);
         body.setOwnerId(owner);
         body.setDate(new Timestamp(System.currentTimeMillis()));
-        paymentsRepository.save(body);
+        message.getInfo("addPayment()", body, owner);
+        try {
+            paymentsRepository.save(body);
+        } catch (Exception e) {
+            throw new DataIntegrityException(id, e.getCause().toString(), e.getMessage());
+        }
     }
     @PutMapping("/{id}")
     public void replacePayment(@PathVariable Integer id, @RequestBody Payments newPayment) {
         Optional<Payments> paymentsValuesToReplace = paymentsRepository.findById(id);
+        if(paymentsValuesToReplace.orElse(null) == null) throw new EntityNotFoundException(id);
         message.getInfo("start :: replacePayments()", paymentsValuesToReplace);
         paymentsValuesToReplace.ifPresent(payment -> {
             payment.setId(id);
@@ -95,6 +107,7 @@ public class PaymentsController extends RestExceptionHandler {
             @PathVariable Integer id,
             @RequestBody Payments paymentToUpdate) {
         Optional<Payments> paymentValuesToUpdate = paymentsRepository.findById(id);
+        if(paymentValuesToUpdate.orElse(null) == null) throw new EntityNotFoundException(id);
         message.getInfo("start :: updatePayment()", paymentValuesToUpdate);
         paymentValuesToUpdate.ifPresent(payment -> {
             if(paymentToUpdate.getId() != null) payment.setId(id);
@@ -107,6 +120,8 @@ public class PaymentsController extends RestExceptionHandler {
     }
     @DeleteMapping("/{id}")
     void deletePayment(@PathVariable Integer id) {
+        Payments paymentToDelete = paymentsRepository.findPaymentById(id);
+        if(paymentToDelete == null) throw new EntityNotFoundException(id);
         message.getInfo("deletePayment()", paymentsRepository.findPaymentById(id));
         paymentsRepository.delete(paymentsRepository.findPaymentById(id));
     }

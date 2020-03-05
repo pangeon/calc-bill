@@ -127,6 +127,7 @@ public class OwnerController extends RestExceptionHandler {
             @PathVariable Integer id,
             @RequestBody Owner newOwner) {
         Optional<Owner> ownerValuesToReplace = ownerRepository.findById(id);
+        if (ownerValuesToReplace.orElse(null) == null) throw new EntityNotFoundException(id);
         message.getInfo("start :: replaceOwner()", ownerValuesToReplace);
         ownerValuesToReplace.ifPresent(owner -> {
             owner.setId(id);
@@ -141,6 +142,7 @@ public class OwnerController extends RestExceptionHandler {
             @PathVariable Integer id,
             @RequestBody Owner ownerToUpdate) {
         Optional<Owner> ownerValuesToUpdate = ownerRepository.findById(id);
+        if (ownerValuesToUpdate.orElse(null) == null) throw new EntityNotFoundException(id);
         message.getInfo("start :: updateOwner()", ownerValuesToUpdate);
         ownerValuesToUpdate.ifPresent(owner -> {
             if(ownerToUpdate.getId() != null) owner.setId(id);
@@ -152,7 +154,9 @@ public class OwnerController extends RestExceptionHandler {
     }
     @DeleteMapping("/{id}")
     public void deleteOwner(@PathVariable Integer id) {
-        message.getInfo("deleteOwner()", ownerRepository.findOwnerById(id));
-        ownerRepository.delete(ownerRepository.findOwnerById(id));
+        Owner ownerToDelete = ownerRepository.findOwnerById(id);
+        if(ownerToDelete == null) throw new EntityNotFoundException(id);
+        message.getInfo("deleteOwner()", ownerToDelete);
+        ownerRepository.delete(ownerToDelete);
     }
 }

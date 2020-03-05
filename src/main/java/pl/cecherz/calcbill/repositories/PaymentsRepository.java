@@ -11,6 +11,7 @@ import java.util.List;
 public interface PaymentsRepository extends CrudRepository<Payments, Integer> {
 
     Payments findPaymentById(Integer id);
+    Payments findPaymentByOwnerId(Owner ownerId);
     List<Payments> findPaymentsByKind(String kindOfPayments);
     List<Payments> findPaymentsByOwnerId(Owner ownerId);
     List<Payments> findPaymentsByAmountBetween(Double min, Double max);

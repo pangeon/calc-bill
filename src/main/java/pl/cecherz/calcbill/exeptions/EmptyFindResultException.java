@@ -8,12 +8,13 @@ public class EmptyFindResultException extends RuntimeException {
         this.entityId = entityId;
         this.findResult = findResult;
     }
-
-    public Integer getEntityId() {
+    public EmptyFindResultException(String findResult) {
+        this.findResult = findResult;
+    }
+    Integer getEntityId() {
         return entityId;
     }
-
-    public String getFindResult() {
+    String getFindResult() {
         return findResult;
     }
 }

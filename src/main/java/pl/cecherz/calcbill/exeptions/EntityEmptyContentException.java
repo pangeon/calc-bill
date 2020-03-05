@@ -6,7 +6,6 @@ public class EntityEmptyContentException extends RuntimeException {
     public EntityEmptyContentException(Integer entityId) {
         this.entityId = entityId;
     }
-
     Integer getEntityId() {
         return entityId;
     }
