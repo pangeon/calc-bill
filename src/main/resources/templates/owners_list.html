@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <title>CALC-BILL</title>
+</head>
+<body>
+    <h2 class="text-center bg-primary text-white">Lista użytkowników</h2>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Imię</th>
+            <th scope="col">Nazwisko</th>
+        </tr>
+        </thead>
+        <tr th:each="owners : ${owners}">
+            <td th:text="${owners.id}"></td>
+            <td th:text="${owners.name}"></td>
+            <td th:text="${owners.surname}"></td>
+        </tr>
+        <tr>
+            <td><a href="/">Powrót</a></td>
+            <td class="bg-primary"></td>
+            <td class="bg-primary"></td>
+        </tr>
+    </table>
+</body>
+</html>
