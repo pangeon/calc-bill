@@ -4,8 +4,7 @@
     <title>Getting Started: Consume REST-API</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="js/owner_list.js"></script>
-    <script src="js/payments_list.js"></script>
+    <script src="js/owner_payments_list.js"></script>
     <style>
         table, tr, td {
             border: 1px solid black;
@@ -24,17 +23,24 @@
         <ul>
             <li><a href="/">Dodaj użytkownika</a></li>
             <li><a href="/">Dodaj nową płatność</a></li>
-            <li><a href="owner_payments.html">Lista dla użytkownika.</a></li>
         </ul>
     </nav>
     <div>
-        <h1>Lista Użytkowników</h1>
-        <table class="owner-list"></table>
-    </div>
-    <div>
-        <h1>Lista wszystkich płatności</h1>
-        <table class="payments-list"></table>
+        <h1>Lista płatności</h1>
+        <table class="owner-payments-list"></table>
         <br />
+        <table>
+            <tr>
+                <td>
+                    <h1>Lista płatności dla użytkownika</h1>
+                    <form method="get" action="owner_payments.html">
+                        <label>Podaj numer użytkownika</label><br />
+                        <input id="id" type="number" /><br />
+                        <input type="submit" value="Pokaż" />
+                    </form>
+                </td>
+            </tr>
+        </table>
         <table>
             <tr>
                 <td>
