@@ -9,30 +9,26 @@
     <title>CALC-BILL</title>
 </head>
 <body>
-    <h2 class="text-center bg-primary text-white">Lista użytkowników</h2>
+    <h2 class="text-center bg-primary text-white">Lista płatności</h2>
+    <p  class="text-center bg-warning text-white" th:text="${owner.name} + ' ' + ${owner.surname}"></p>
     <table class="table table-hover">
         <thead>
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">Imię</th>
-            <th scope="col">Nazwisko</th>
-            <th scope="col">Lista płatności</th>
-            <th scope="col">Aktualizuj</th>
-            <th scope="col">Usuń</th>
+            <th scope="col">Wartość</th>
+            <th scope="col">Rodzaj</th>
+            <th scope="col">Data</th>
         </tr>
         </thead>
-        <tr th:each="owners : ${owners}">
-            <td th:text="${owners.id}"></td>
-            <td th:text="${owners.name}"></td>
-            <td th:text="${owners.surname}"></td>
-            <td><a th:href="'owners/' + ${owners.id} + '/payments'" methods="get">Pokaż liste</a></td>
-            <td><a th:href="'owners/' + ${owners.id}" methods="update">Edytuj dane</a></td>
-            <td><a th:href="'owners/' + ${owners.id}" methods="delete">Skasuj</a></td>
+        <tr th:each="ownersPayments : ${ownersPayments}">
+            <td th:text="${ownersPayments.id}"></td>
+            <td th:text="${ownersPayments.amount}"></td>
+            <td th:text="${ownersPayments.kind}"></td>
+            <td th:text="${ownersPayments.date}"></td>
+
         </tr>
         <tr>
             <td><a href="/">Powrót</a></td>
-            <td class="bg-primary"></td>
-            <td class="bg-primary"></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>
