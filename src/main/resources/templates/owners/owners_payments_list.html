@@ -25,10 +25,9 @@
             <td th:text="${ownersPayments.amount}"></td>
             <td th:text="${ownersPayments.kind}"></td>
             <td th:text="${ownersPayments.date}"></td>
-
         </tr>
         <tr>
-            <td><a href="/">Powrót</a></td>
+            <td><a th:href="@{/api/web/owners/}">Powrót</a></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>

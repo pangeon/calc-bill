@@ -3,35 +3,25 @@
     <head>
         <title>Strona Startowa</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <!-- <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" /> -->
+        <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
               integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
               crossorigin="anonymous">
-        <style>
-            h2 {
-                padding: 1%;
-                margin: 1%;
-            }
-            td {
-                font-size: 20px;
-                border-bottom: black 1px solid;
-            }
-        </style>
     </head>
     <body>
         <h2 class="text-center bg-primary text-white">Strona główna</h2>
         <table class="table table-hover">
             <tr>
                 <td>Test aplikacji:</td>
-                <td><a href="/greeting">kliknij</a></td>
+                <td><a th:href="@{/greeting}">kliknij</a></td>
             </tr>
             <tr>
                 <td>Wyświetl użytkowników:</td>
-                <td><a href="/api/web/owners">kliknij</a></td>
+                <td><a th:href="@{/api/web/owners}">kliknij</a></td>
             </tr>
             <tr>
                 <td>Dodaj użytkownika:</td>
-                <td><a href="api/web/owners/add">kliknij</a></td>
+                <td><a th:href="@{api/web/owners/add}">kliknij</a></td>
             </tr>
         </table>
     </body>

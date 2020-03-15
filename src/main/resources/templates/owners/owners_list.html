@@ -25,12 +25,12 @@
             <td th:text="${owners.id}"></td>
             <td th:text="${owners.name}"></td>
             <td th:text="${owners.surname}"></td>
-            <td><a th:href="'owners/' + ${owners.id} + '/payments'" methods="get">Pokaż liste</a></td>
-            <td><a th:href="'owners/' + ${owners.id}" methods="update">Edytuj dane</a></td>
-            <td><a th:href="'owners/' + ${owners.id}" methods="delete">Skasuj</a></td>
+            <td><a th:href="@{/api/web/owners/{id}/payments(id=${owners.id})}">Lista płatności</a></td>
+            <td><a th:href="@{/api/web/owners/{id}(id=${owners.id})}">Edytuj dane</a></td>
+            <td><a th:href="@{/api/web/owners/delete/{id}(id=${owners.id})}">Skasuj</a></td>
         </tr>
         <tr>
-            <td><a href="/">Powrót</a></td>
+            <td><a th:href="@{/}">Powrót</a></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>

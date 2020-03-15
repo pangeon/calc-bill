@@ -3,9 +3,9 @@ package pl.cecherz.calcbill.controller.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import pl.cecherz.calcbill.controller.web.ui_utils.WebViewBuilder;
 import pl.cecherz.calcbill.exeptions.EmptyFindResultException;
 import pl.cecherz.calcbill.exeptions.EntityEmptyContentException;
 import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
@@ -34,13 +34,14 @@ import java.util.stream.Collectors;
  * getSumOwnerPayments(/{id}/payments/sum)
  * getSumOwnerPaymentsByKind(/{id}/payments/sum/{kind})
  *
+ *
  * addOwner()
  * updateOwner({id})
- * replaceOwner({id})
- * deleteOwner({id}) - usuwa dane z bazy: tabele Owner i Payments
+ * deleteOwner(/delete/{id}) - usuwa dane z bazy: tabele Owner i Payments
+ * redirectToAddOwnerDataPage(/add)
  *
  */
-@Controller
+@RestController
 @RequestMapping("/api/web/owners")
 @Component("OwnerControllerWeb")
 public class OwnerController extends RestExceptionHandler {
@@ -51,13 +52,13 @@ public class OwnerController extends RestExceptionHandler {
     }
     @GetMapping()
     public ModelAndView getAllOwners() {
-        ModelAndView ownersListView = new ModelAndView("owners_list");
+        ModelAndView ownersListView = new ModelAndView("owners/owners_list");
         ownersListView.addObject("owners", ownerRepository.findAll());
         return ownersListView;
     }
     @GetMapping("/{id}")
     public ModelAndView getOwner(@PathVariable Integer id) {
-        ModelAndView ownerView = new ModelAndView("edit_owner_data");
+        ModelAndView ownerView = new ModelAndView("owners/edit_owner_data");
 
         Owner owner = ownerRepository.findOwnerById(id);
         if (owner == null) throw new EntityNotFoundException(id);
@@ -67,7 +68,7 @@ public class OwnerController extends RestExceptionHandler {
     }
     @GetMapping("/{id}/payments")
     public ModelAndView getOwnerPayments(@PathVariable Integer id) {
-        ModelAndView ownersPaymentsListView = new ModelAndView("owners_payments_list");
+        ModelAndView ownersPaymentsListView = new ModelAndView("owners/owners_payments_list");
 
         Owner owner = ownerRepository.findOwnerById(id);
         if (owner == null) throw new EntityNotFoundException(id);
@@ -80,8 +81,8 @@ public class OwnerController extends RestExceptionHandler {
         return ownersPaymentsListView;
     }
     @GetMapping("/add")
-    public String redirectToAddOwnerDataPage(Owner owner) {
-        return "add_owner_data";
+    public ModelAndView redirectToAddOwnerDataPage(Owner owner) {
+        return new ModelAndView("owners/add_owner_data");
     }
     @GetMapping("/{id}/payments/{kind}")
     public List<Payments> getOwnerPaymentsByKind(
@@ -98,10 +99,7 @@ public class OwnerController extends RestExceptionHandler {
         return ownerPaymentsByKind;
     }
     @GetMapping("/{id}/payments/{min}/{max}")
-    public List<Payments> getOwnerPaymentsByAmonutRange(
-            @PathVariable Integer id,
-            @PathVariable Double min,
-            @PathVariable Double max) {
+    public List<Payments> getOwnerPaymentsByAmonutRange(@PathVariable Integer id, @PathVariable Double min, @PathVariable Double max) {
         Owner owner = ownerRepository.findOwnerById(id);
         if (owner == null) throw new EntityNotFoundException(id);
 
@@ -113,27 +111,23 @@ public class OwnerController extends RestExceptionHandler {
         return ownerPaymentsByAmountRange;
     }
     @GetMapping(value = "/{id}/payments/sum", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Double getSumOwnerPayments(
-            @PathVariable Integer id) {
-        Double sum = PaymentsCalculator.sumOwnerPayments(id, ownerRepository);
-        return sum;
+    public Double getSumOwnerPayments(@PathVariable Integer id) {
+        return PaymentsCalculator.sumOwnerPayments(id, ownerRepository);
     }
     @GetMapping(value = "/{id}/payments/sum/{kind}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Double getSumOwnerPaymentsByKind(
-            @PathVariable Integer id,
-            @PathVariable String kind) {
-        Double sum = PaymentsCalculator.sumOwnerPaymentsByKind(id, kind, ownerRepository);
-        return sum;
+    public Double getSumOwnerPaymentsByKind(@PathVariable Integer id, @PathVariable String kind) {
+        return PaymentsCalculator.sumOwnerPaymentsByKind(id, kind, ownerRepository);
     }
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public void addOwner(@RequestBody Owner body) {
+    public ModelAndView addOwner(Owner body) {
         ownerRepository.save(body);
+        return WebViewBuilder.returnOwnerListView(ownerRepository);
     }
-    @PutMapping("/{id}")
-    public void replaceOwner(
+    @PostMapping("/{id}")
+    public ModelAndView replaceOwner(
             @PathVariable Integer id,
-            @RequestBody Owner newOwner) {
+            Owner newOwner) {
         Optional<Owner> ownerValuesToReplace = ownerRepository.findById(id);
         if (ownerValuesToReplace.orElse(null) == null) throw new EntityNotFoundException(id);
         ownerValuesToReplace.ifPresent(owner -> {
@@ -142,24 +136,16 @@ public class OwnerController extends RestExceptionHandler {
             owner.setSurname(newOwner.getSurname());
         });
         ownerRepository.save(ownerValuesToReplace.orElse(null));
+
+        return WebViewBuilder.returnOwnerListView(ownerRepository);
     }
-    @PatchMapping("/{id}")
-    public void updateOwner(
-            @PathVariable Integer id,
-            @RequestBody Owner ownerToUpdate) {
-        Optional<Owner> ownerValuesToUpdate = ownerRepository.findById(id);
-        if (ownerValuesToUpdate.orElse(null) == null) throw new EntityNotFoundException(id);
-        ownerValuesToUpdate.ifPresent(owner -> {
-            if(ownerToUpdate.getId() != null) owner.setId(id);
-            if(ownerToUpdate.getName() != null) owner.setName(ownerToUpdate.getName());
-            if(ownerToUpdate.getSurname() != null) owner.setSurname(ownerToUpdate.getSurname());
-        });
-        ownerRepository.save(ownerValuesToUpdate.orElse(null));
-    }
-    @DeleteMapping("/{id}")
-    public void deleteOwner(@PathVariable Integer id) {
+    @GetMapping("/delete/{id}")
+    public ModelAndView deleteOwner(@PathVariable Integer id) {
         Owner ownerToDelete = ownerRepository.findOwnerById(id);
         if(ownerToDelete == null) throw new EntityNotFoundException(id);
         ownerRepository.delete(ownerToDelete);
+
+        return WebViewBuilder.returnOwnerListView(ownerRepository);
     }
+
 }
