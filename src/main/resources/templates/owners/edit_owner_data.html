@@ -8,7 +8,7 @@
           crossorigin="anonymous">
     <title>CALC-BILL</title>
 </head>
-<body>
+<body class="container">
     <h2 class="text-center bg-info text-white">Edytuj dane użytkownika</h2>
     <form action="#" th:action="@{/api/web/owners/{id}(id=${owner.id})}" th:object="${owner}" method="post" class="container border border-danger">
         <div class="form-group row">

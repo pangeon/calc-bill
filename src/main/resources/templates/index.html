@@ -8,7 +8,7 @@
               integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
               crossorigin="anonymous">
     </head>
-    <body>
+    <body class="container">
         <h2 class="text-center bg-primary text-white">Strona główna</h2>
         <table class="table table-hover">
             <tr>
@@ -18,6 +18,10 @@
             <tr>
                 <td>Wyświetl użytkowników:</td>
                 <td><a th:href="@{/api/web/owners}">kliknij</a></td>
+            </tr>
+            <tr>
+                <td>Wyświetl wszystkie płatności:</td>
+                <td><a th:href="@{/api/web/payments}">kliknij</a></td>
             </tr>
             <tr>
                 <td>Dodaj użytkownika:</td>
