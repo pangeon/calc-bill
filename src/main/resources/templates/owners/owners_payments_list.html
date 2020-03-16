@@ -9,6 +9,7 @@
     <title>CALC-BILL</title>
 </head>
 <body class="container">
+<!------ PREZENTACJA DANYCH ------->
     <h2 class="text-center bg-primary text-white">Lista płatności</h2>
     <p  class="text-center bg-warning text-white" th:text="${owner.name} + ' ' + ${owner.surname}"></p>
     <table class="table table-hover">
@@ -18,6 +19,8 @@
             <th scope="col">Wartość</th>
             <th scope="col">Rodzaj</th>
             <th scope="col">Data</th>
+            <th scope="col">Aktualizuj</th>
+            <th scope="col">Usuń</th>
         </tr>
         </thead>
         <tr th:each="ownersPayments : ${ownersPayments}">
@@ -25,13 +28,87 @@
             <td th:text="${ownersPayments.amount}"></td>
             <td th:text="${ownersPayments.kind}"></td>
             <td th:text="${ownersPayments.date}"></td>
+            <td><a th:href="@{/api/web/payments/{id}(id=${ownersPayments.id})}">Edytuj dane</a></td>
+            <td><a th:href="@{/api/web/payments/delete/{id}(id=${ownersPayments.id})}">Skasuj</a></td>
         </tr>
         <tr>
             <td><a th:href="@{/api/web/owners/}">Powrót</a></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>
             <td class="bg-primary"></td>
+            <td class="bg-primary"></td>
+            <td class="bg-primary"></td>
         </tr>
     </table>
+
+    <!------ WPROWADZANIE DANYCH ------->
+    <form action="#" th:action="@{/api/web/{id}(id=${owner.id})}" th:object="${payment}" method="post" class="container border border-danger">
+        <h2 class="text-center bg-success text-white">Dodaj płatność</h2>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Wartość</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" id="amount" th:field="*{amount}" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Rodzaj</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" id="_kind" th:field="*{kind}" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+            </div>
+        </div>
+    </form>
+
+    <!------ WYSZUKIWANIE ------->
+    <form method="get"  class="container border border-danger">
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Rodzaj płatności</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" id="kind" name="kind" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-success">Filtruj dane według rodzaju</button>
+            </div>
+        </div>
+    </form>
+    <form method="get" th:action="@{/api/web/owners/filter/{id}/payments(id=${owner.id})}" class="container border border-danger">
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Wartość graniczna</label>
+            </div>
+            <div class="col-sm-5">
+                <input class="form-control" placeholder="min" id="min" name="min" />
+            </div>
+            <div class="col-sm-5">
+                <input class="form-control" placeholder="max" id="max" name="max" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-success">Wypisz dane z przedziału</button>
+            </div>
+        </div>
+    </form>
+    <form class="container border border-danger">
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <a style="color: white" th:href="@{/api/web/owners/filter/{id}/payments(id=${owner.id})}">
+                    <button type="button" class="btn btn-danger">Odśwież</button>
+                </a>
+            </div>
+        </div>
+    </form>
 </body>
 </html>

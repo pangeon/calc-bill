@@ -45,18 +45,19 @@ public class PaymentsController extends RestExceptionHandler {
         return WebViewBuilder.returnPaymentListView(paymentsRepository);
     }
     @GetMapping("/{id}")
-    public Payments getPayment(
+    public ModelAndView getPayment(
             @PathVariable Integer id) {
         Payments payment = paymentsRepository.findPaymentById(id);
         if (payment == null) throw new EntityNotFoundException(id);
-        return payment;
+
+        return WebViewBuilder.returnPaymentItemView(payment);
     }
     @GetMapping(params = "kind")
     public ModelAndView filterPaymentsByKind(@RequestParam("kind") String kind) {
         List<Payments> paymentsByKind = paymentsRepository.findPaymentsByKind(kind);;
         if (paymentsByKind.isEmpty()) throw new EmptyFindResultException(kind);
 
-        return WebViewBuilder.returnPaymentListView(paymentsRepository, paymentsByKind);
+        return WebViewBuilder.returnPaymentListView(paymentsByKind);
     }
     @GetMapping(params = {"min", "max"})
     public ModelAndView filterPaymentsByOwnerIdAndAmonutRange(@RequestParam("min") Double min, @RequestParam("max") Double max) {
@@ -64,11 +65,11 @@ public class PaymentsController extends RestExceptionHandler {
         String range = min + " - " + max;
         if (paymentsByAmount.isEmpty()) throw new EmptyFindResultException(range);
 
-        return WebViewBuilder.returnPaymentListView(paymentsRepository, paymentsByAmount);
+        return WebViewBuilder.returnPaymentListView(paymentsByAmount);
     }
     @PostMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addPayment (@RequestBody Payments body, @PathVariable Integer id) {
+    public ModelAndView addPayment (Payments body, @PathVariable Integer id) {
         Owner owner = new Owner();
         owner.setId(id);
         body.setOwnerId(owner);
@@ -78,9 +79,10 @@ public class PaymentsController extends RestExceptionHandler {
         } catch (Exception e) {
             throw new DataIntegrityException(id, e.getCause().toString(), e.getMessage());
         }
+        return new ModelAndView("/index");
     }
-    @PutMapping("/{id}")
-    public void replacePayment(@PathVariable Integer id, @RequestBody Payments newPayment) {
+    @PostMapping("/edit/{id}")
+    public ModelAndView replacePayment(@PathVariable Integer id, Payments newPayment) {
         Optional<Payments> paymentsValuesToReplace = paymentsRepository.findById(id);
         if(paymentsValuesToReplace.orElse(null) == null) throw new EntityNotFoundException(id);
         paymentsValuesToReplace.ifPresent(payment -> {
@@ -90,23 +92,15 @@ public class PaymentsController extends RestExceptionHandler {
             payment.setDate(new Timestamp(System.currentTimeMillis()));
         });
         paymentsRepository.save(paymentsValuesToReplace.orElse(null));
+
+        return new ModelAndView("/index");
     }
-    @PatchMapping("/{id}")
-    public void updatePayment(@PathVariable Integer id, @RequestBody Payments paymentToUpdate) {
-        Optional<Payments> paymentValuesToUpdate = paymentsRepository.findById(id);
-        if(paymentValuesToUpdate.orElse(null) == null) throw new EntityNotFoundException(id);
-        paymentValuesToUpdate.ifPresent(payment -> {
-            if(paymentToUpdate.getId() != null) payment.setId(id);
-            if(paymentToUpdate.getAmount() != null) payment.setAmount(paymentToUpdate.getAmount());
-            if(paymentToUpdate.getKind() != null) payment.setKind(paymentToUpdate.getKind());
-            payment.setDate(new Timestamp(System.currentTimeMillis()));
-        });
-        paymentsRepository.save(paymentValuesToUpdate.orElse(null));
-    }
-    @DeleteMapping("/{id}")
-    void deletePayment(@PathVariable Integer id) {
+    @GetMapping("delete/{id}")
+    ModelAndView deletePayment(@PathVariable Integer id) {
         Payments paymentToDelete = paymentsRepository.findPaymentById(id);
         if(paymentToDelete == null) throw new EntityNotFoundException(id);
         paymentsRepository.delete(paymentToDelete);
+
+        return new ModelAndView("/index");
     }
 }

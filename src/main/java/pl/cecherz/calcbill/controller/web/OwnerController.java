@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import pl.cecherz.calcbill.controller.web.ui_utils.WebViewBuilder;
 import pl.cecherz.calcbill.exeptions.EmptyFindResultException;
-import pl.cecherz.calcbill.exeptions.EntityEmptyContentException;
 import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
 import pl.cecherz.calcbill.exeptions.RestExceptionHandler;
 import pl.cecherz.calcbill.model.db.Owner;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
  *
  *
  * addOwner()
- * updateOwner({id})
+ * replaceOwner({id})
  * deleteOwner(/delete/{id}) - usuwa dane z bazy: tabele Owner i Payments
  * redirectToAddOwnerDataPage(/add)
  *
@@ -59,7 +58,6 @@ public class OwnerController extends RestExceptionHandler {
     @GetMapping("/{id}")
     public ModelAndView getOwner(@PathVariable Integer id) {
         ModelAndView ownerView = new ModelAndView("owners/edit_owner_data");
-
         Owner owner = ownerRepository.findOwnerById(id);
         if (owner == null) throw new EntityNotFoundException(id);
 
@@ -70,13 +68,15 @@ public class OwnerController extends RestExceptionHandler {
     public ModelAndView getOwnerPayments(@PathVariable Integer id) {
         ModelAndView ownersPaymentsListView = new ModelAndView("owners/owners_payments_list");
 
+        Payments payment = new Payments();
         Owner owner = ownerRepository.findOwnerById(id);
+        payment.setOwnerId(owner);
         if (owner == null) throw new EntityNotFoundException(id);
         ownersPaymentsListView.addObject("owner", owner);
 
         List<Payments> ownerPayments = owner.getPayments();
-        if (ownerPayments.isEmpty()) throw new EntityEmptyContentException(id);
         ownersPaymentsListView.addObject("ownersPayments", ownerPayments);
+        ownersPaymentsListView.addObject("payment", payment);
 
         return ownersPaymentsListView;
     }
@@ -84,10 +84,10 @@ public class OwnerController extends RestExceptionHandler {
     public ModelAndView redirectToAddOwnerDataPage(Owner owner) {
         return new ModelAndView("owners/add_owner_data");
     }
-    @GetMapping("/{id}/payments/{kind}")
-    public List<Payments> getOwnerPaymentsByKind(
+    @GetMapping(value = "/filter/{id}/payments", params = "kind")
+    public ModelAndView getOwnerPaymentsByKind(
             @PathVariable Integer id,
-            @PathVariable String kind) {
+            @RequestParam("kind") String kind) {
         Owner owner = ownerRepository.findOwnerById(id);
         if (owner == null) throw new EntityNotFoundException(id);
 
@@ -96,9 +96,9 @@ public class OwnerController extends RestExceptionHandler {
                 .collect(Collectors.toList());
         if (ownerPaymentsByKind.isEmpty()) throw new EmptyFindResultException(id, kind);
 
-        return ownerPaymentsByKind;
+        return WebViewBuilder.returnOwnerListView(ownerPaymentsByKind);
     }
-    @GetMapping("/{id}/payments/{min}/{max}")
+    @GetMapping("/filter/{id}/payments/{min}/{max}")
     public List<Payments> getOwnerPaymentsByAmonutRange(@PathVariable Integer id, @PathVariable Double min, @PathVariable Double max) {
         Owner owner = ownerRepository.findOwnerById(id);
         if (owner == null) throw new EntityNotFoundException(id);
@@ -125,9 +125,7 @@ public class OwnerController extends RestExceptionHandler {
         return WebViewBuilder.returnOwnerListView(ownerRepository);
     }
     @PostMapping("/{id}")
-    public ModelAndView replaceOwner(
-            @PathVariable Integer id,
-            Owner newOwner) {
+    public ModelAndView replaceOwner(@PathVariable Integer id, Owner newOwner) {
         Optional<Owner> ownerValuesToReplace = ownerRepository.findById(id);
         if (ownerValuesToReplace.orElse(null) == null) throw new EntityNotFoundException(id);
         ownerValuesToReplace.ifPresent(owner -> {
@@ -136,7 +134,6 @@ public class OwnerController extends RestExceptionHandler {
             owner.setSurname(newOwner.getSurname());
         });
         ownerRepository.save(ownerValuesToReplace.orElse(null));
-
         return WebViewBuilder.returnOwnerListView(ownerRepository);
     }
     @GetMapping("/delete/{id}")
