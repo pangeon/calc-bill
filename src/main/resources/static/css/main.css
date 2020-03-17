@@ -1,0 +1,10 @@
+table, tr, td {
+    border: 1px solid black;
+}
+div {
+    float: left;
+    margin: 5%;
+}
+h1 {
+    text-align: center;
+}

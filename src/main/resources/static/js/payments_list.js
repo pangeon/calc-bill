@@ -10,8 +10,6 @@ $(document).ready(function() {
                         '<td>' + data[i].amount + '</td>' +
                         '<td>' + data[i].kind + '</td>' +
                         '<td>' + data[i].date + '</td>' +
-                        '<td><a href="/">Edytuj</a></td>' +
-                        '<td><a href="/">Usuń</a></td>' +
                     '</tr>')
         }
     });

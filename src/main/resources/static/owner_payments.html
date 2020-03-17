@@ -3,28 +3,11 @@
 <head>
     <title>Getting Started: Consume REST-API</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="js/owner_payments_list.js"></script>
-    <style>
-        table, tr, td {
-            border: 1px solid black;
-        }
-        div {
-            float: left;
-            margin: 5%;
-        }
-        h1 {
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="/">Dodaj użytkownika</a></li>
-            <li><a href="/">Dodaj nową płatność</a></li>
-        </ul>
-    </nav>
     <div>
         <h1>Lista płatności</h1>
         <table class="owner-payments-list"></table>
@@ -37,25 +20,6 @@
                         <label>Podaj numer użytkownika</label><br />
                         <input id="id" type="text">
                         <input id="button" type="submit" value="Pokaż" />
-                    </form>
-                </td>
-            </tr>
-        </table>
-        <table>
-            <tr>
-                <td>
-                    <form>
-                        <label>Dane według rodzaju</label><br />
-                        <input type="search" /><br />
-                        <input type="submit" value="Filtruj" />
-                    </form>
-                </td>
-                <td>
-                    <form>
-                        <label>Dane według wartości granicznych</label><br />
-                        <input name="min" type="search" value="min" /><br />
-                        <input name="max" type="search" value="max" /><br />
-                        <input type="submit" value="Filtruj"/>
                     </form>
                 </td>
             </tr>
