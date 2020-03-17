@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import pl.cecherz.calcbill.controller.web.ui_utils.WebViewBuilder;
-import pl.cecherz.calcbill.exeptions.EmptyFindResultException;
 import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
 import pl.cecherz.calcbill.exeptions.RestExceptionHandler;
 import pl.cecherz.calcbill.model.db.Owner;
@@ -16,7 +15,6 @@ import pl.cecherz.calcbill.utils.PaymentsCalculator;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Klasa ma zastosowanie w przypadku odwoływania się do całego zbioru płatności z uwzględnienieniem
@@ -28,11 +26,6 @@ import java.util.stream.Collectors;
  * getAllOwners()
  * getOwner(/{id})
  * getOwnerPayments(/{id}/payments)
- * getOwnerPaymentsByKind(/{id}/payments/{kind})
- * getOwnerPaymentsByAmonutRange(/{id}/payments/{min}/{max})
- * getSumOwnerPayments(/{id}/payments/sum)
- * getSumOwnerPaymentsByKind(/{id}/payments/sum/{kind})
- *
  *
  * addOwner()
  * replaceOwner({id})
@@ -83,32 +76,6 @@ public class OwnerController extends RestExceptionHandler {
     @GetMapping("/add")
     public ModelAndView redirectToAddOwnerDataPage(Owner owner) {
         return new ModelAndView("owners/add_owner_data");
-    }
-    @GetMapping(value = "/filter/{id}/payments", params = "kind")
-    public ModelAndView getOwnerPaymentsByKind(
-            @PathVariable Integer id,
-            @RequestParam("kind") String kind) {
-        Owner owner = ownerRepository.findOwnerById(id);
-        if (owner == null) throw new EntityNotFoundException(id);
-
-        final List<Payments> ownerPaymentsByKind = owner.getPayments()
-                .stream().filter(payment -> payment.getKind().equals(kind))
-                .collect(Collectors.toList());
-        if (ownerPaymentsByKind.isEmpty()) throw new EmptyFindResultException(id, kind);
-
-        return WebViewBuilder.returnOwnerListView(ownerPaymentsByKind);
-    }
-    @GetMapping("/filter/{id}/payments/{min}/{max}")
-    public List<Payments> getOwnerPaymentsByAmonutRange(@PathVariable Integer id, @PathVariable Double min, @PathVariable Double max) {
-        Owner owner = ownerRepository.findOwnerById(id);
-        if (owner == null) throw new EntityNotFoundException(id);
-
-        final List<Payments> ownerPaymentsByAmountRange = ownerRepository.findOwnerById(id).getPayments()
-                .stream().filter(payment -> payment.getAmount() > min && payment.getAmount() < max)
-                .collect(Collectors.toList());
-        String range = min + " - " + max;
-        if(ownerPaymentsByAmountRange.isEmpty()) throw new EmptyFindResultException(id, range);
-        return ownerPaymentsByAmountRange;
     }
     @GetMapping(value = "/{id}/payments/sum", produces = MediaType.APPLICATION_JSON_VALUE)
     public Double getSumOwnerPayments(@PathVariable Integer id) {
