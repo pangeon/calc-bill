@@ -43,9 +43,9 @@ public class PaymentsController extends RestExceptionHandler {
         this.paymentsRepository = paymentsRepository;
     }
     @GetMapping()
-    public Iterable<Payments> getAllPayments() {
+    public List<Payments> getAllPayments() {
         message.getInfo("getAllPayments()", paymentsRepository.findAll());
-        return paymentsRepository.findAll();
+        return (List<Payments>) paymentsRepository.findAll();
     }
     @GetMapping("/{id}")
     public Payments getPayment(
@@ -65,7 +65,7 @@ public class PaymentsController extends RestExceptionHandler {
         return paymentsByKind;
     }
     @GetMapping(params = {"min", "max"})
-    public List<Payments> filterPaymentsByOwnerIdAndAmonutRange(
+    public List<Payments> filterPaymentsByAmonutRange(
             @RequestParam("min") Double min,
             @RequestParam("max") Double max) {
         List<Payments> paymentsByAmount = paymentsRepository.findPaymentsByAmountBetween(min, max);

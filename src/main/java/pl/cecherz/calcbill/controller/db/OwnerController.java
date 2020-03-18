@@ -50,9 +50,9 @@ public class OwnerController extends RestExceptionHandler {
         this.ownerRepository = ownerRepository;
     }
     @GetMapping()
-    public Iterable<Owner> getAllOwners() {
+    public List<Owner> getAllOwners() {
         message.getInfo("getAllOwners()", ownerRepository.findAll());
-        return ownerRepository.findAll();
+        return (List<Owner>) ownerRepository.findAll();
     }
     @GetMapping("/{id}")
     public Owner getOwner(
@@ -108,6 +108,8 @@ public class OwnerController extends RestExceptionHandler {
     @GetMapping(value = "/{id}/payments/sum", produces = MediaType.APPLICATION_JSON_VALUE)
     public Double getSumOwnerPayments(
             @PathVariable Integer id) {
+        Owner owner = ownerRepository.findOwnerById(id);
+        if (owner == null) throw new EntityNotFoundException(id);
         Double sum = PaymentsCalculator.sumOwnerPayments(id, ownerRepository);
         message.getInfo("getSumOwnerPayments()", sum, "ownerId", id);
         return sum;

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Payment </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+</head>
+<body>
+
+    <table>
+        <tr th:each="payments : ${payments}">
+            <td th:text="${payments.id}"></td>
+            <td th:text="${payments.amount}"></td>
+            <td th:text="${payments.kind}"></td>
+            <td th:text="${payments.date}"></td>
+        </tr>
+    </table>
+    <form action="#" th:action="@{/web/payments/{id}(id=${owner.id})}" th:object="${payment}" method="post" class="container border border-danger">
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Wartość</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" th:field="*{amount}" id="amount" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Rodzaj</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" th:field="*{kind}" id="kind" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary">Wyślij</button>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <a style="color: white" th:href="@{/web/payments/}">
+                    <button type="button" class="btn btn-info">Powrót</button>
+                </a>
+            </div>
+        </div>
+    </form>
+</body>
+</html>
