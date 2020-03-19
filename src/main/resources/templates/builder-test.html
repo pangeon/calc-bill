@@ -9,8 +9,9 @@
           crossorigin="anonymous">
 </head>
 <body>
-    <a href="/web/add-owner">Dodaj Użytkownika</a>
-    <a href="/web/add-payment">Dodaj Płatność</a>
+    <a href="/web/redirect-to-add-owner">Dodaj Użytkownika</a>
+    <a href="/web/owners">Lista użytkowników</a>
+    <a href="/web/payments">Lista wszystkich płatności</a>
     <h1 th:if="${owner != null}" th:text="${owner.name}"></h1>
     <h1 th:if="${payment != null}" th:text="${payment.amount}"></h1>
     <h1 th:if="${sumOwnerPayments != null}" th:text="${sumOwnerPayments}"></h1>
@@ -20,8 +21,10 @@
             <td th:text="${owners.id}"></td>
             <td th:text="${owners.name}"></td>
             <td th:text="${owners.surname}"></td>
-            <td><a th:href="@{/web/add-payment/{id}(id=${owners.id})}">Dodaj płatność</a></td>
+            <td><a th:href="@{/web/redirect-to-add-payment/{id}(id=${owners.id})}">Dodaj płatność</a></td>
             <td><a th:href="@{/web/owner-payments/{id}(id=${owners.id})}">Lista płatności</a></td>
+            <td><a th:href="@{/web/redirect-to-edit-owner/{id}(id=${owners.id})}">Edytuj</a></td>
+            <td><a th:href="@{/web/delete-owner/{id}(id=${owners.id})}">Usuń użytkownika</a></td>
         </tr>
     </table>
     <table>
@@ -38,8 +41,11 @@
             <td th:text="${ownerPayments.amount}"></td>
             <td th:text="${ownerPayments.kind}"></td>
             <td th:text="${ownerPayments.date}"></td>
+            <td><a th:href="@{/web/redirect-to-edit-payment/{id}(id=${ownerPayments.id})}">Edytuj</a></td>
+            <td><a th:href="@{/web/delete-payment/{id}(id=${ownerPayments.id})}">Usuń płatność</a></td>
         </tr>
     </table>
+    <p th:if="${sum != null}" th:text="'Suma: ' + ${sum}"></p>
     <table>
         <tr th:each="paymentsByKind : ${paymentsByKind}">
             <td th:text="${paymentsByKind.id}"></td>

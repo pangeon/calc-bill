@@ -122,7 +122,7 @@ public class PaymentsController extends RestExceptionHandler {
         message.getInfo("end :: updatePayment()", paymentValuesToUpdate);
     }
     @DeleteMapping("/{id}")
-    void deletePayment(@PathVariable Integer id) {
+    public void deletePayment(@PathVariable Integer id) {
         Payments paymentToDelete = paymentsRepository.findPaymentById(id);
         if(paymentToDelete == null) throw new EntityNotFoundException(id);
         message.getInfo("deletePayment()", paymentToDelete);

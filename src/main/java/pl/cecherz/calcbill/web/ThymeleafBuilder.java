@@ -8,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 import pl.cecherz.calcbill.controller.db.OwnerController;
 import pl.cecherz.calcbill.controller.db.PaymentsController;
 import pl.cecherz.calcbill.exeptions.EmptyFindResultException;
+import pl.cecherz.calcbill.exeptions.EntityEmptyContentException;
 import pl.cecherz.calcbill.exeptions.EntityNotFoundException;
 import pl.cecherz.calcbill.model.db.Owner;
 import pl.cecherz.calcbill.model.db.Payments;
@@ -25,22 +26,37 @@ public class ThymeleafBuilder {
         this.ownerController = ownerController;
         this.paymentsController = paymentsController;
     }
-    /* ------------------------- Metody GET --------------------- */
+    /* ------------------------- Przekierowania --------------------- */
         @RequestMapping(method = RequestMethod.GET)
         public ModelAndView startWeb() {
             return new ModelAndView("builder-test");
         }
-        @RequestMapping(value="/add-owner", method = RequestMethod.GET)
+        @RequestMapping(value="/redirect-to-add-owner", method = RequestMethod.GET)
         public ModelAndView redirectToOwnerAddForm() {
             return new ModelAndView("add-owner-form", "owner", new Owner());
         }
-        @RequestMapping(value="/add-payment/{id}", method = RequestMethod.GET)
+        @RequestMapping(value="/redirect-to-edit-owner/{id}", method = RequestMethod.GET)
+        public ModelAndView redirectToOwnerEditForm(@PathVariable Integer id) {
+            return new ModelAndView("edit-owner-form", "owner", ownerController.getOwner(id));
+        }
+        @RequestMapping(value="/redirect-to-add-payment/{id}", method = RequestMethod.GET)
         public ModelAndView redirectToPaymentAddForm(@PathVariable Integer id) {
             ModelAndView view = new ModelAndView("add-payment-form");
             view.addObject("owner", ownerController.getOwner(id));
-            view.addObject("payment", ownerController.getOwnerPayments(id));
+            view.addObject("payment", new Payments());
             return view;
         }
+        @RequestMapping(value="/redirect-to-edit-payment/{id}", method = RequestMethod.GET)
+        public ModelAndView redirectToPaymentEditForm(@PathVariable Integer id) {
+            ModelAndView view = new ModelAndView("edit-payment-form");
+            //view.addObject("owner", ownerController.getOwner(id));
+            view.addObject("payment", paymentsController.getPayment(id));
+            return view;
+        }
+    /* ------------------------- Przekierowania --------------------- */
+
+    /* ------------------------- Metody GET --------------------- */
+
         @RequestMapping(value = "/owners", method = RequestMethod.GET)
         public ModelAndView forwardOwnersListToWeb() {
             return returnListView("builder-test", "owners", ownerController.getAllOwners());
@@ -68,7 +84,12 @@ public class ThymeleafBuilder {
         @RequestMapping(value = "/owner-payments/{id}", method = RequestMethod.GET)
         public ModelAndView forwardOwnerPaymetsListToWeb(@PathVariable Integer id) {
             try {
-                return returnItemView("builder-test", "ownerPayments", ownerController.getOwnerPayments(id));
+                ModelAndView view = new ModelAndView("builder-test");
+                view.addObject("sum", ownerController.getSumOwnerPayments(id));
+                view.addObject("ownerPayments", ownerController.getOwnerPayments(id));
+                return view; //returnItemView("builder-test", "ownerPayments", ownerController.getOwnerPayments(id));
+            } catch(EntityEmptyContentException e) {
+                return new ModelAndView("error-empty-content");
             } catch (EntityNotFoundException e) {
                 return new ModelAndView("error-entity-not-found");
             }
@@ -130,17 +151,42 @@ public class ThymeleafBuilder {
     /* ------------------------- Metody GET --------------------- */
 
     /* ------------------------- Metody POST --------------------- */
-    @RequestMapping(value = "/owners", method = RequestMethod.POST)
-    public ModelAndView forwardAddOwnerToWeb(Owner owner) {
-        ownerController.addOwner(owner);
-        return returnListView("builder-test", "owners", ownerController.getAllOwners());
-    }
-    @RequestMapping(value = "/payments/{id}", method = RequestMethod.POST)
-    public ModelAndView forwardAddOwnerPaymentToWeb(Payments payment, @PathVariable Integer id) {
-        paymentsController.addPayment(payment, id);
-        return returnListView("builder-test", "owners", ownerController.getAllOwners());
-    }
+        @RequestMapping(value = "/owners", method = RequestMethod.POST)
+        public ModelAndView forwardAddOwnerToWeb(Owner owner) {
+            ownerController.addOwner(owner);
+            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+        }
+        @RequestMapping(value = "/payments/{id}", method = RequestMethod.POST)
+        public ModelAndView forwardAddOwnerPaymentToWeb(Payments payment, @PathVariable Integer id) {
+            paymentsController.addPayment(payment, id);
+            return new ModelAndView("success");
+        }
     /* ------------------------- Metody POST --------------------- */
+    /* ------------------------- Metody PUT --------------------- */
+        @RequestMapping(value = "/edit-owner/{id}", method = RequestMethod.POST)
+        public ModelAndView forwardreplaceOwnerToWeb(@PathVariable Integer id, Owner owner) {
+            ownerController.replaceOwner(id, owner);
+            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+        }
+        @RequestMapping(value = "/edit-payment/{id}", method = RequestMethod.POST)
+        public ModelAndView forwardreplaceOwnerToWeb(@PathVariable Integer id, Payments payment) {
+            paymentsController.replacePayment(id, payment);
+            ModelAndView view = new ModelAndView("builder-test");
+            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+        }
+    /* ------------------------- Metody PUT --------------------- */
+    /* ------------------------- Metody DELETE --------------------- */
+        @RequestMapping(value = "/delete-owner/{id}", method = RequestMethod.GET)
+        public ModelAndView forwardDeleteOwnerToWeb(@PathVariable Integer id) {
+            ownerController.deleteOwner(id);
+            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+        }
+        @RequestMapping(value = "/delete-payment/{id}", method = RequestMethod.GET)
+        public ModelAndView forwardDeletePaymentToWeb(@PathVariable Integer id) {
+            paymentsController.deletePayment(id);
+            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+        }
+    /* ------------------------- Metody DELETE --------------------- */
 
     /* ------------------------- Metody prywatne --------------------- */
         private ModelAndView returnListView(String viewName, String attributeName, List<?> list) {

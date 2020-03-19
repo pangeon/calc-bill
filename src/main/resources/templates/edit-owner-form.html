@@ -9,13 +9,21 @@
           crossorigin="anonymous">
 </head>
 <body>
-    <form action="#" th:action="@{/web/owners}" th:object="${owner}" method="post" class="container border border-danger">
+    <form action="#" th:action="@{/web/edit-owner/{id}(id=${owner.id})}" th:object="${owner}" method="post" class="container border border-danger">
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Id</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" th:value="${id}" readonly id="id" />
+            </div>
+        </div>
         <div class="form-group row">
             <div class="col-sm-2">
                 <label>Imię</label>
             </div>
             <div class="col-sm-10">
-                <input class="form-control" th:field="*{name}" id="name" />
+                <input class="form-control" th:value="${name}" th:field="*{name}" id="name" />
             </div>
         </div>
         <div class="form-group row">
@@ -23,7 +31,7 @@
                 <label>Nazwisko</label>
             </div>
             <div class="col-sm-10">
-                <input class="form-control" th:field="*{surname}" id="surname" />
+                <input class="form-control" th:value="${surname}" th:field="*{surname}" id="surname" />
             </div>
         </div>
         <div class="form-group row">
