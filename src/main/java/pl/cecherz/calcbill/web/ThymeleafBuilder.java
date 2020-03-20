@@ -29,7 +29,7 @@ public class ThymeleafBuilder {
     /* ------------------------- Przekierowania --------------------- */
         @RequestMapping(method = RequestMethod.GET)
         public ModelAndView startWeb() {
-            return new ModelAndView("builder-test");
+            return new ModelAndView("html-view-manager");
         }
         @RequestMapping(value="/redirect-to-add-owner", method = RequestMethod.GET)
         public ModelAndView redirectToOwnerAddForm() {
@@ -59,16 +59,16 @@ public class ThymeleafBuilder {
 
         @RequestMapping(value = "/owners", method = RequestMethod.GET)
         public ModelAndView forwardOwnersListToWeb() {
-            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+            return returnListView("html-view-manager", "owners", ownerController.getAllOwners());
         }
         @RequestMapping(value = "/payments", method = RequestMethod.GET)
         public ModelAndView forwardPaymentsListToWeb() {
-            return returnListView("builder-test", "payments", paymentsController.getAllPayments());
+            return returnListView("html-view-manager", "payments", paymentsController.getAllPayments());
         }
         @RequestMapping(value = "/owner/{id}", method = RequestMethod.GET)
         public ModelAndView forwardOwnerToWeb(@PathVariable Integer id) {
             try {
-                return returnItemView("builder-test", "owner", ownerController.getOwner(id));
+                return returnItemView("html-view-manager", "owner", ownerController.getOwner(id));
             } catch (EntityNotFoundException e) {
                 return new ModelAndView("error-entity-not-found");
             }
@@ -76,7 +76,7 @@ public class ThymeleafBuilder {
         @RequestMapping(value = "/payments/{id}", method = RequestMethod.GET)
         public ModelAndView forwardPaymentToWeb(@PathVariable Integer id) {
             try {
-                return returnItemView("builder-test", "payment", paymentsController.getPayment(id));
+                return returnItemView("html-view-manager", "payment", paymentsController.getPayment(id));
             } catch (EntityNotFoundException e) {
                 return new ModelAndView("error-entity-not-found");
             }
@@ -84,48 +84,28 @@ public class ThymeleafBuilder {
         @RequestMapping(value = "/owner-payments/{id}", method = RequestMethod.GET)
         public ModelAndView forwardOwnerPaymetsListToWeb(@PathVariable Integer id) {
             try {
-                ModelAndView view = new ModelAndView("builder-test");
+                ModelAndView view = new ModelAndView("html-view-manager");
                 view.addObject("sum", ownerController.getSumOwnerPayments(id));
                 view.addObject("ownerPayments", ownerController.getOwnerPayments(id));
-                return view; //returnItemView("builder-test", "ownerPayments", ownerController.getOwnerPayments(id));
+                return view;
             } catch(EntityEmptyContentException e) {
                 return new ModelAndView("error-empty-content");
             } catch (EntityNotFoundException e) {
                 return new ModelAndView("error-entity-not-found");
             }
         }
-        @RequestMapping(value = "/owner-payments/{id}/{kind}", method = RequestMethod.GET)
-        public ModelAndView forwardOwnerPaymetsListByKindToWeb(@PathVariable Integer id, @PathVariable String kind) {
+        @RequestMapping(value = "/payments-filter-by-kind", method = RequestMethod.GET)
+        public ModelAndView forwardPaymetsListByKindToWeb(String kind) {
             try {
-                return returnItemView("builder-test", "ownerPaymentsByKind", ownerController.getOwnerPaymentsByKind(id, kind));
-            } catch(EmptyFindResultException e) {
-                return new ModelAndView("error-empty-find");
-            } catch (EntityNotFoundException e) {
-                return new ModelAndView("error-entity-not-found");
-            }
-        }
-        @RequestMapping(value = "/payments-filter/{kind}", method = RequestMethod.GET)
-        public ModelAndView forwardPaymetsListByKindToWeb(@PathVariable String kind) {
-            try {
-                return returnItemView("builder-test", "paymentsByKind", paymentsController.filterPaymentsByKind(kind));
+                return returnItemView("html-view-manager", "payments", paymentsController.filterPaymentsByKind(kind));
             } catch(EmptyFindResultException e) {
                 return new ModelAndView("error-empty-find");
             }
         }
-        @RequestMapping(value = "/owner-payments/{id}/{min}/{max}", method = RequestMethod.GET)
-        public ModelAndView forwardOwnerPaymetsListByAmountToWeb(@PathVariable Integer id, @PathVariable Double min,  @PathVariable Double max) {
+        @RequestMapping(value = "/payments-filter-by-amount", method = RequestMethod.GET)
+        public ModelAndView forwardPaymetsListByAmountToWeb(Double min, Double max) {
             try {
-                return returnItemView("builder-test", "ownerPaymentsByAmount", ownerController.getOwnerPaymentsByAmonutRange(id, min, max));
-            } catch (EmptyFindResultException e) {
-                return new ModelAndView("error-empty-find");
-            } catch (EntityNotFoundException e) {
-                return new ModelAndView("error-entity-not-found");
-            }
-        }
-        @RequestMapping(value = "/payments-filter/{min}/{max}", method = RequestMethod.GET)
-        public ModelAndView forwardPaymetsListByAmountToWeb(@PathVariable Double min, @PathVariable Double max) {
-            try {
-                return returnItemView("builder-test", "paymentsByAmount", paymentsController.filterPaymentsByAmonutRange(min, max));
+                return returnItemView("html-view-manager", "payments", paymentsController.filterPaymentsByAmonutRange(min, max));
             } catch(EmptyFindResultException e) {
                 return new ModelAndView("error-empty-find");
             }
@@ -133,18 +113,8 @@ public class ThymeleafBuilder {
         @RequestMapping(value = "/sum-owner-payments/{id}", method = RequestMethod.GET)
         public ModelAndView forwardOwnerPaymetsSumToWeb(@PathVariable Integer id) {
             try {
-                return returnItemView("builder-test", "sumOwnerPayments", ownerController.getSumOwnerPayments(id));
+                return returnItemView("html-view-manager", "sumOwnerPayments", ownerController.getSumOwnerPayments(id));
             } catch (EntityNotFoundException e) {
-                return new ModelAndView("error-entity-not-found");
-            }
-        }
-        @RequestMapping(value = "/sum-owner-payments/{id}/{kind}", method = RequestMethod.GET)
-        public ModelAndView forwardOwnerPaymetsSumByKindToWeb(@PathVariable Integer id, @PathVariable String kind) {
-            try {
-                return returnItemView("builder-test", "sumOwnerPaymentsByKind", ownerController.getSumOwnerPaymentsByKind(id, kind));
-            } catch(EmptyFindResultException e) {
-                return new ModelAndView("error-empty-find");
-            } catch (EntityNotFoundException e){
                 return new ModelAndView("error-entity-not-found");
             }
         }
@@ -154,7 +124,7 @@ public class ThymeleafBuilder {
         @RequestMapping(value = "/owners", method = RequestMethod.POST)
         public ModelAndView forwardAddOwnerToWeb(Owner owner) {
             ownerController.addOwner(owner);
-            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+            return returnListView("html-view-manager", "owners", ownerController.getAllOwners());
         }
         @RequestMapping(value = "/payments/{id}", method = RequestMethod.POST)
         public ModelAndView forwardAddOwnerPaymentToWeb(Payments payment, @PathVariable Integer id) {
@@ -166,25 +136,25 @@ public class ThymeleafBuilder {
         @RequestMapping(value = "/edit-owner/{id}", method = RequestMethod.POST)
         public ModelAndView forwardreplaceOwnerToWeb(@PathVariable Integer id, Owner owner) {
             ownerController.replaceOwner(id, owner);
-            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+            return returnListView("html-view-manager", "owners", ownerController.getAllOwners());
         }
         @RequestMapping(value = "/edit-payment/{id}", method = RequestMethod.POST)
         public ModelAndView forwardreplaceOwnerToWeb(@PathVariable Integer id, Payments payment) {
             paymentsController.replacePayment(id, payment);
             ModelAndView view = new ModelAndView("builder-test");
-            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+            return new ModelAndView("success");
         }
     /* ------------------------- Metody PUT --------------------- */
     /* ------------------------- Metody DELETE --------------------- */
         @RequestMapping(value = "/delete-owner/{id}", method = RequestMethod.GET)
         public ModelAndView forwardDeleteOwnerToWeb(@PathVariable Integer id) {
             ownerController.deleteOwner(id);
-            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+            return returnListView("html-view-manager", "owners", ownerController.getAllOwners());
         }
         @RequestMapping(value = "/delete-payment/{id}", method = RequestMethod.GET)
         public ModelAndView forwardDeletePaymentToWeb(@PathVariable Integer id) {
             paymentsController.deletePayment(id);
-            return returnListView("builder-test", "owners", ownerController.getAllOwners());
+            return returnListView("html-view-manager", "owners", ownerController.getAllOwners());
         }
     /* ------------------------- Metody DELETE --------------------- */
 

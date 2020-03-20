@@ -1,14 +1,51 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<html lang="pl">
 <head>
-    <title>Strona Startowa</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:400,400i,700,900&display=swap" rel="stylesheet">
+    <meta http-equiv="refresh" content="5;url=http://localhost:8080/" />
+    <title>Niepowodzenie</title>
 </head>
+<style>
+    body {
+        text-align: center;
+        padding: 40px 0;
+        background: #EBF0F5;
+    }
+    h1 {
+        color: black;
+        font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+        font-weight: 900;
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+    p {
+        color: #404F5E;
+        font-family: "Nunito Sans", "Helvetica Neue", sans-serif;
+        font-size:20px;
+        margin: 0;
+    }
+    i {
+        color: black;
+        font-size: 100px;
+        line-height: 200px;
+        margin-left:-15px;
+    }
+    .card {
+        background: white;
+        padding: 60px;
+        border-radius: 4px;
+        box-shadow: 0 2px 3px #C8D0D8;
+        display: inline-block;
+        margin: 0 auto;
+    }
+</style>
 <body>
-    <h1 style="color: red">Podany obiekt nie istnieje !</h1>
+<div class="card">
+    <div style="border-radius:200px; height:200px; width:200px; background: yellow; margin:0 auto;">
+        <i class="checkmark">!</i>
+    </div>
+    <h1>Niepowodzenie</h1>
+    <p>Podany obiekt nie istnieje !</p>
+</div>
 </body>
 </html>

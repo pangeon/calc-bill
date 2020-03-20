@@ -1,0 +1,16 @@
+td, tr {
+    border: 1px black solid;
+}
+h2 {
+    padding: 1%;
+}
+p {
+    padding: 0.5%;
+}
+button {
+    width: 100%;
+}
+form {
+    padding: 2%;
+    margin-bottom: 1%;
+}
