@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>Edytuj użytkownika</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
           crossorigin="anonymous">
-    <title>CALC-BILL</title>
 </head>
-<body class="container">
-    <h2 class="text-center bg-info text-white">Edytuj dane użytkownika</h2>
-    <form action="#" th:action="@{/api/web/owners/{id}(id=${owner.id})}" th:object="${owner}" method="post" class="container border border-danger">
+<body>
+    <form action="#" th:action="@{/web/edit-owner/{id}(id=${owner.id})}" th:object="${owner}" method="post" class="container border border-danger">
         <div class="form-group row">
             <div class="col-sm-2">
                 <label>Id</label>
             </div>
-            <div class="col-sm-2">
-                <input class="form-control" th:value="${owner.id}" th:field="*{id}" readonly />
+            <div class="col-sm-10">
+                <input class="form-control" th:value="${id}" readonly id="id" />
             </div>
         </div>
         <div class="form-group row">
@@ -24,7 +23,7 @@
                 <label>Imię</label>
             </div>
             <div class="col-sm-10">
-                <input class="form-control" th:value="${owner.name}" th:field="*{name}" />
+                <input class="form-control" th:value="${name}" th:field="*{name}" id="name" />
             </div>
         </div>
         <div class="form-group row">
@@ -32,7 +31,7 @@
                 <label>Nazwisko</label>
             </div>
             <div class="col-sm-10">
-                <input class="form-control" th:value="${owner.surname}" th:field="*{surname}" />
+                <input class="form-control" th:value="${surname}" th:field="*{surname}" id="surname" />
             </div>
         </div>
         <div class="form-group row">
@@ -42,7 +41,7 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <a style="color: white" th:href="@{/api/web/owners/}">
+                <a style="color: white" th:href="@{/web/owners/}">
                     <button type="button" class="btn btn-info">Powrót</button>
                 </a>
             </div>

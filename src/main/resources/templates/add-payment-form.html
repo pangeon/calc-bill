@@ -1,30 +1,37 @@
 <!DOCTYPE html>
 <html lang="pl" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>Dodaj płatność</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
           crossorigin="anonymous">
-    <title>CALC-BILL</title>
 </head>
-<body class="container">
-    <h2 class="text-center bg-warning text-white">Dodaj nowego użytkownika</h2>
-    <form action="#" th:action="@{/api/web/owners}" th:object="${owner}" method="post" class="container border border-danger">
-        <div class="form-group row">
+<body>
+    <form action="#" th:action="@{/web/payments/{id}(id=${owner.id})}" th:object="${payment}" method="post" class="container border border-danger">
+        <div class="form-group row" style="display: none">
             <div class="col-sm-2">
-                <label>Imię</label>
+                <label>Id</label>
             </div>
             <div class="col-sm-10">
-                <input class="form-control" th:field="*{name}" id="name" />
+                <input class="form-control" th:value="${owner.id}" th:field="*{id}" id="id" />
             </div>
         </div>
         <div class="form-group row">
             <div class="col-sm-2">
-                <label>Nazwisko</label>
+                <label>Wartość</label>
             </div>
             <div class="col-sm-10">
-                <input class="form-control" th:field="*{surname}" />
+                <input class="form-control" th:field="*{amount}" id="amount" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-2">
+                <label>Rodzaj</label>
+            </div>
+            <div class="col-sm-10">
+                <input class="form-control" th:field="*{kind}" id="kind" />
             </div>
         </div>
         <div class="form-group row">
@@ -34,7 +41,7 @@
         </div>
         <div class="form-group row">
             <div class="col-sm-12">
-                <a style="color: white" th:href="@{/api/web/owners/}">
+                <a style="color: white" th:href="@{/web/payments/}">
                     <button type="button" class="btn btn-info">Powrót</button>
                 </a>
             </div>

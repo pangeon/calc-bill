@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Strona Startowa aplikacji</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/main.css}" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+</head>
+<body class="container">
+    <!-- Nawigacja -->
+        <nav class="navbar navbar-light bg-light border border-primary">
+            <form class="form-inline text-center">
+                <a href="/web/redirect-to-add-owner">
+                    <button class="btn btn-outline-primary" type="button">Dodaj Użytkownika</button>
+                </a>
+                <a href="/web/owners">
+                    <button class="btn btn-outline-primary" type="button">Lista użytkowników</button>
+                </a>
+                <a href="/web/payments">
+                    <button class="btn btn-outline-primary" type="button">Lista wszystkich płatności</button>
+                </a>
+            </form>
+        </nav>
+    <!-- Nawigacja -->
+    <!-- Lista użytkowników -->
+        <table th:if="${owners != null}" class="table table-hover">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Imię</th>
+                <th scope="col">Nazwisko</th>
+                <th scope="col">#</th>
+                <th scope="col">#</th>
+                <th scope="col">#</th>
+                <th scope="col">#</th>
+            </tr>
+            <tr th:each="owners : ${owners}">
+                <td th:text="${owners.id}"></td>
+                <td th:text="${owners.name}"></td>
+                <td th:text="${owners.surname}"></td>
+                <td>
+                    <a th:href="@{/web/redirect-to-add-payment/{id}(id=${owners.id})}">
+                        <button class="btn btn-outline-success" type="button">Dodaj płatność</button>
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/web/owner-payments/{id}(id=${owners.id})}">
+                        <button class="btn btn-outline-success" type="button">Lista płatności</button>
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/web/redirect-to-edit-owner/{id}(id=${owners.id})}">
+                        <button class="btn btn-outline-success" type="button">Edytuj</button>
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/web/delete-owner/{id}(id=${owners.id})}">
+                        <button class="btn btn-outline-danger" type="button">Usuń użytkownika</button>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    <!-- Lista użytkowników -->
+
+    <!-- Lista wszystkich płatności -->
+        <table class="table table-hover">
+            <tr th:if="${payments != null}">
+                <th scope="col">Id</th>
+                <th scope="col">Rodzaj</th>
+                <th scope="col">Wartość</th>
+                <th scope="col">Data</th>
+            </tr>
+            <tr th:each="payments : ${payments}">
+                <td th:text="${payments.id}"></td>
+                <td th:text="${payments.amount}"></td>
+                <td th:text="${payments.kind}"></td>
+                <td th:text="${payments.date}"></td>
+            </tr>
+        </table>
+        <!-- Lista wszystkich płatności (filtrowanie po rodzaju) -->
+        <h2 th:if="${payments != null}" class="text-center bg-warning text-white">Filtrowanie płatności po rodzaju</h2>
+        <form th:action="@{/web/payments-filter-by-kind}" th:if="${payments != null}" method="get" class="container border border-danger">
+            <div class="form-group row">
+                <div class="col-sm-2">
+                    <label>Rodzaj płatności</label>
+                </div>
+                <div class="col-sm-10">
+                    <input class="form-control" placeholder="kind" id="kind" name="kind" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn btn-success">Filtruj</button>
+                </div>
+            </div>
+        </form>
+        <!-- Lista wszystkich płatności (filtrowanie po rodzaju) -->
+
+        <!-- Lista wszystkich płatności (filtrowanie po wartościach granicznych) -->
+        <h2 th:if="${payments != null}" class="text-center bg-warning text-white">Filtrowanie płatności po wartościach granicznych</h2>
+        <form th:action="@{/web/payments-filter-by-amount}" th:if="${payments != null}" method="get" class="container border border-danger">
+            <div class="form-group row">
+                <div class="col-sm-2">
+                    <label>Wysokość płatności</label>
+                </div>
+                <div class="col-sm-5">
+                    <input class="form-control" placeholder="min" id="min" name="min" />
+                </div>
+                <div class="col-sm-5">
+                    <input class="form-control" placeholder="max" id="max" name="max" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <button type="submit" class="btn btn-success">Filtruj</button>
+                </div>
+            </div>
+        </form>
+        <!-- Lista wszystkich płatności (filtrowanie po wartościach granicznych) -->
+        <form th:if="${payments != null}" class="container border border-danger">
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <a style="color: white" th:href="@{/web/payments}">
+                        <button type="button" class="btn btn-danger">Odśwież</button>
+                    </a>
+                </div>
+            </div>
+        </form>
+    <!-- Lista wszystkich płatności -->
+
+    <!-- Lista płatności konkretnego użytkownika -->
+        <table class="table table-hover">
+            <tr th:if="${ownerPayments != null}">
+                <th scope="col">Id</th>
+                <th scope="col">Rodzaj</th>
+                <th scope="col">Wartość</th>
+                <th scope="col">Data</th>
+                <th scope="col">#</th>
+                <th scope="col">#</th>
+            </tr>
+            <tr th:each="ownerPayments : ${ownerPayments}">
+                <td th:text="${ownerPayments.id}"></td>
+                <td th:text="${ownerPayments.amount}"></td>
+                <td th:text="${ownerPayments.kind}"></td>
+                <td th:text="${ownerPayments.date}"></td>
+                <td>
+                    <a th:href="@{/web/redirect-to-edit-payment/{id}(id=${ownerPayments.id})}">
+                        <button class="btn btn-outline-success" type="button">Edytuj</button>
+                    </a>
+                </td>
+                <td>
+                    <a th:href="@{/web/delete-payment/{id}(id=${ownerPayments.id})}">
+                        <button class="btn btn-outline-danger" type="button">Usuń</button>
+                    </a>
+                </td>
+            </tr>
+        </table>
+        <!-- Suma --> <h2 th:if="${sum != null}" th:text="'Suma: ' + ${sum}" class="text-center bg-warning text-white"></h2> <!-- Suma -->
+    <!-- Lista płatności konkretnego użytkownika -->
+</body>
+</html>
