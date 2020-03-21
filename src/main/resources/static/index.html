@@ -1,13 +1,69 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Getting Started: Serving Web Content</title>
+    <title>Strona Powitalna</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
           crossorigin="anonymous">
 </head>
-<body class="container">
-    <a href="/web/owners"><h1 class="text-center bg-info text-white">START</h1></a>
+<body class="border border-info" style="margin-left: 20%; margin-right: 20%">
+    <div class="" style="background-color: #EBF0F5; padding: 5%; margin: 0">
+        <div class="row">
+            <div class="col-sm text-center">
+                <h2 class="bg-info text-white rounded-lg">CALC-BILL</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 text-justify">
+                <h3 class="bg-primary text-white text-center rounded-lg">OPIS</h3>
+                <p class="text-white bg-warning text-center rounded-lg">Przenaczenie</p>
+                <p class="list-group-item">
+                    Aplikacja przeznaczona do porządkowania rachunków w gospodarstwie domowym.
+                    Stworzona w celu łatwiejszego zarządzania budżetem. Pozwala na robienie oszczędności
+                    poprzez monitorowanie poszczególnych zakupów.
+                </p>
+                <p class="text-white bg-warning text-center rounded-lg">Szczegóły implementacji</p>
+                <p class="list-group-item">
+                    Aplikacja posiada własne <a href="/api.html">REST-API</a>
+                </p>
+                <p class="text-white bg-warning text-center rounded-lg">Autor</p>
+                <p class="list-group-item font-weight-bold">Kamil Cecherz</p>
+                <p class="text-white bg-warning text-center rounded-lg">Prawa autorskie</p>
+                <p class="list-group-item">
+                    Aplikacja o otwartym <a href="https://github.com/pangeon/calc-bill">kodzie źródłowym</a>.<br />
+                    Licencja typu: <a href="https://www.gnu.org/licenses/gpl-3.0.html">GPL</a>
+                </p>
+            </div>
+            <div class="col-lg-6 text-justify">
+                <h3 class="bg-primary text-white text-center rounded-lg">HISTORIA WERSJI</h3>
+                <p class="text-white bg-warning text-center rounded-lg">Wersja 1.0</p>
+                <ul class="list-group">
+                    <li class="list-group-item-info text-center" style="list-style: none">Data: 21.03.2020</li>
+                    <li class="list-group-item">Możliwość dodawania/edycji użytkowników aplikacji.</li>
+                    <li class="list-group-item">Możliwość dodadawnia/edycji płatności i przypisywania jej użytkownikom.</li>
+                    <li class="list-group-item">Funkcja usuwania danych.</li>
+                    <li class="list-group-item">Podgląd zsumowanych wartości wszystkich płatności dla konkretnego ich posiadacza.</li>
+                    <li class="list-group-item">Filtrowanie zestawienia płatności wszystkich użytkowników</li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <h3 class="bg-primary text-white text-center rounded-lg">SZCZEGÓŁY IMLEMENTACJI</h3>
+                <p class="list-group-item text-center">
+                    Aplikacja posiada własne <a href="/api.html">REST-API</a>.
+                    Widok obsługuje część funkcjonalności dostępnych w API.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm text-center">
+                <a href="/web/owners">
+                    <button class="btn btn-outline-primary" type="button" style="width: 100%; margin-top: 1%;">START</button>
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
