@@ -1,3 +1,11 @@
+# Web page
+<strong>The application was deploy on: <a href="https://calc-bill.herokuapp.com/">Heroku</a></strong>
+
+#### Destination:
+
+An application designed to organize bills in the household. Created for easier budget management. 
+It allows you to make savings by monitoring individual purchases.
+
 # Deployment guide
 
 ## Running application on local machine
@@ -78,3 +86,7 @@ file on location calc-bill/src/main/resources.
 
 ## Relations:
 ![table diagram](readme-img/model_mysql_workbench.png)
+
+# Troubles
+* Redirects on files: success.html and error.html on head sections.
+* Application require JDK 11 
