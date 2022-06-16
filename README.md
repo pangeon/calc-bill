@@ -50,15 +50,6 @@ a running environment and an empty database.
 </li>          
 </ol>
 
-## Switch to local database
-
-Change connection parameters in [application.properties](https://github.com/pangeon/calc-bill/blob/master/src/main/resources/application.properties) 
-file on location calc-bill/src/main/resources. 
-
-   - Uncomment line 1 and 3, 
-    
-   - Comment line 2 and 4. 
-
 # Database CALC_BILL
 
 ## Structure:
